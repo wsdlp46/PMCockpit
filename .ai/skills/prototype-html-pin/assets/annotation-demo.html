@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>色标编号标注方案 - 效果演示</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f3f6; color: #333; overflow: hidden; height: 100vh; }
+  .demo-layout { display: flex; height: 100vh; }
+
+  .product-area {
+    width: 78%; background: #fff;
+    display: flex; flex-direction: column; overflow: hidden;
+    position: relative;
+  }
+  .top-nav { height: 48px; background: #165DFF; color: #fff; display: flex; align-items: center; padding: 0 20px; font-size: 14px; font-weight: 500; }
+  .bread { padding: 12px 20px; font-size: 13px; color: #86909c; border-bottom: 1px solid #f0f1f3; }
+  .filter-bar {
+    padding: 12px 20px; display: flex; gap: 12px; align-items: center;
+    border-bottom: 1px solid #f0f1f3;
+  }
+  .filter-bar input, .filter-bar select {
+    height: 32px; border: 1px solid #d9dbde; border-radius: 4px;
+    padding: 0 10px; font-size: 13px; color: #333;
+  }
+  .filter-bar input { width: 200px; }
+  .filter-bar select { width: 140px; }
+  .btn-group { display: flex; gap: 8px; margin-left: auto; position: relative; }
+  .btn {
+    height: 32px; padding: 0 16px; border-radius: 4px;
+    font-size: 13px; cursor: pointer; border: 1px solid #d9dbde;
+    background: #fff; color: #333;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .btn.primary { background: #165DFF; color: #fff; border-color: #165DFF; }
+
+  /* 账号认证状态卡片 */
+  .auth-card-row {
+    padding: 14px 20px; display: flex; gap: 14px;
+    border-bottom: 1px solid #f0f1f3; background: #fafbfc;
+  }
+  .auth-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px; border-radius: 6px;
+    border: 1px solid #e5e6eb; background: #fff;
+    min-width: 260px; position: relative;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .auth-card .avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #e8f0fe; display: flex; align-items: center;
+    justify-content: center; font-size: 14px; color: #165DFF;
+    flex-shrink: 0;
+  }
+  .auth-card .info { flex: 1; }
+  .auth-card .info .name { font-size: 13px; font-weight: 500; color: #333; }
+  .auth-card .info .org { font-size: 11px; color: #86909c; margin-top: 2px; }
+  .auth-card .auth-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 10px; border-radius: 12px; font-size: 11px;
+    font-weight: 500; flex-shrink: 0;
+  }
+  .auth-card .expiry { font-size: 11px; color: #86909c; margin-top: 4px; }
+
+  /* 认证状态 4 种样式 */
+  .auth-card.state-verified  { border-color: #C2E7D1; background: #f6fdf9; }
+  .auth-card.state-verified  .auth-badge { background: #e8f7ed; color: #00B42A; }
+  .auth-card.state-unverified { border-color: #e5e6eb; background: #fafafa; }
+  .auth-card.state-unverified .auth-badge { background: #f2f3f5; color: #86909c; }
+  .auth-card.state-pending   { border-color: #FFE4BA; background: #fffcf5; }
+  .auth-card.state-pending   .auth-badge { background: #fff7e8; color: #BA7517; }
+  .auth-card.state-expired   { border-color: #FBC4C4; background: #fef8f8; }
+  .auth-card.state-expired   .auth-badge { background: #fce8e8; color: #F53F3F; }
+
+  /* 状态切换选择器 */
+  .state-switcher {
+    display: flex; gap: 4px; margin-bottom: 6px;
+  }
+  .state-switcher button {
+    padding: 3px 10px; border-radius: 3px; border: 1px solid #e5e6eb;
+    background: #fff; font-size: 11px; color: #606266; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .state-switcher button:hover { border-color: #BA7517; color: #BA7517; }
+  .state-switcher button.active { background: #BA7517; color: #fff; border-color: #BA7517; }
+
+  .table-wrapper { flex: 1; overflow-y: auto; padding: 0 20px 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    background: #f7f8fa; padding: 10px 12px; text-align: left;
+    font-weight: 500; color: #606266; border-bottom: 1px solid #eee;
+    position: sticky; top: 0; z-index: 2;
+  }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; }
+  tbody tr:hover { background: #f5f7ff; }
+  .status-tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; position: relative; }
+  .status-online { background: #e8f7ed; color: #00B42A; }
+  .status-offline { background: #fce8e8; color: #F53F3F; }
+
+  /* 标注目标的高亮 */
+  .anchor-target { position: relative; }
+  .anchor-target.highlighted::after {
+    content: ''; position: absolute; inset: -3px;
+    border: 2px dashed currentColor; border-radius: 4px;
+    pointer-events: none; z-index: 5;
+    animation: dash-loop 1s linear infinite;
+  }
+  @keyframes dash-loop { 0% { opacity: 0.3; } 50% { opacity: 0.8; } 100% { opacity: 0.3; } }
+
+  /* ===== 动态圆点（JS 注入）===== */
+  .pin-overlay {
+    position: fixed; z-index: 100; pointer-events: auto;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    transition: transform 0.15s, box-shadow 0.15s;
+    transform: translate(6px, -50%);
+  }
+  .pin-overlay:hover {
+    transform: translate(6px, -50%) scale(1.3);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.35);
+  }
+  /* 轻量引线（圆点连到目标元素右边缘） */
+  .pin-overlay::before {
+    content: ''; position: absolute; right: 100%; top: 50%;
+    width: 8px; height: 2px; background: inherit;
+  }
+
+  /* ===== 右侧说明面板 ===== */
+  .doc-area {
+    width: 22%; background: #FFFBEB; border-left: 1px solid #fde68a;
+    overflow-y: auto; padding: 20px 16px;
+  }
+  .doc-area h3 { font-size: 15px; font-weight: 600; color: #92400e; margin-bottom: 6px; }
+  .doc-area .subtitle { font-size: 12px; color: #a16207; margin-bottom: 8px; line-height: 1.5; }
+  .toggle-pins {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: #92400e; margin-bottom: 16px;
+    cursor: pointer; user-select: none;
+  }
+  .toggle-pins .switch {
+    width: 36px; height: 20px; border-radius: 10px;
+    background: #BA7517; position: relative;
+    transition: background 0.2s;
+  }
+  .toggle-pins .switch::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; transition: left 0.2s;
+  }
+  .toggle-pins.off .switch { background: #d1d5db; }
+  .toggle-pins.off .switch::after { left: 18px; }
+  .pin-overlay.hidden { display: none; }
+  .doc-item {
+    padding: 10px 12px; border-radius: 6px; margin-bottom: 8px;
+    font-size: 13px; cursor: pointer;
+    transition: background 0.2s; border-left: 3px solid transparent;
+  }
+  .doc-item .doc-pin {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%;
+    font-size: 11px; font-weight: 700; color: #fff;
+    margin-right: 8px; vertical-align: middle; flex-shrink: 0;
+  }
+  .doc-item .doc-label { font-weight: 500; color: #333; }
+  .doc-item .doc-desc { font-size: 12px; color: #86909c; margin-top: 2px; }
+  .doc-item.highlight { border-left-style: solid; }
+</style>
+</head>
+<body>
+<div class="demo-layout">
+
+  <!-- ===== 左侧产品界面 ===== -->
+  <div class="product-area" id="productArea">
+    <div class="top-nav">数据资源管理 — <平台名></div>
+    <div class="bread">工作台 / 资源管理 / 数据资源列表</div>
+
+    <div class="auth-card-row" id="authCardArea">
+      <div class="auth-card state-verified anchor-target" data-anchor="5" id="authCard">
+        <div class="avatar">企</div>
+        <div class="info">
+          <div class="name">福州数据运营中心</div>
+          <div class="org">统一社会信用代码：91350100MA******</div>
+          <div class="expiry">有效期至 2027-03-15</div>
+        </div>
+        <span class="auth-badge" id="authBadge">已认证</span>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" placeholder="搜索资源名称/编码">
+      <select><option>全部状态</option><option>已上架</option><option>已下架</option></select>
+      <select><option>全部数据格式</option><option>电子表格</option><option>数据库</option></select>
+      <div class="btn-group anchor-target" data-anchor="1">
+        <button class="btn primary">+ 新增资源</button>
+        <button class="btn">批量导入</button>
+        <button class="btn">导出</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper" id="tableWrapper">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:50px">序号</th>
+            <th style="width:160px">资源编码</th>
+            <th style="width:180px">资源名称</th>
+            <th style="width:100px" class="anchor-target" data-anchor="2">数据格式</th>
+            <th style="width:120px">所属连接器</th>
+            <th style="width:80px">状态</th>
+            <th style="width:160px">更新时间</th>
+            <th class="anchor-target" data-anchor="3">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td><td>DS-2026-0001</td><td>企业工商登记信息</td>
+            <td>电子表格</td><td>数链通-福州节点</td>
+            <td><span class="status-tag status-online">已上架</span></td>
+            <td>2026-06-14 10:22</td>
+            <td>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">查看</a>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">编辑</a>
+              <a href="#" style="color:#F53F3F;font-size:12px">下架</a>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td><td>DS-2026-0002</td><td>城市交通流量实时数据</td>
+            <td>数据库</td><td>数链通-厦门节点</td>
+            <td><span class="status-tag status-online">已上架</span></td>
+            <td>2026-06-14 09:15</td>
+            <td>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">查看</a>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">编辑</a>
+              <a href="#" style="color:#F53F3F;font-size:12px">下架</a>
+            </td>
+          </tr>
+          <tr>
+            <td>3</td><td>DS-2026-0003</td><td>水环境监测数据集</td>
+            <td>电子表格</td><td>数链通-泉州节点</td>
+            <td><span class="status-tag status-online">已上架</span></td>
+            <td>2026-06-13 16:40</td>
+            <td>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">查看</a>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">编辑</a>
+              <a href="#" style="color:#F53F3F;font-size:12px">下架</a>
+            </td>
+          </tr>
+          <tr>
+            <td>4</td><td>DS-2026-0004</td><td>碳排放企业清单数据</td>
+            <td>数据库</td><td>数链通-漳州节点</td>
+            <td><span class="status-tag status-offline anchor-target" data-anchor="4">已下架</span></td>
+            <td>2026-06-12 11:08</td>
+            <td>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">查看</a>
+              <a href="#" style="color:#165DFF;font-size:12px">重新上架</a>
+            </td>
+          </tr>
+          <tr>
+            <td>5</td><td>DS-2026-0005</td><td>城市规划用地指标</td>
+            <td>电子表格</td><td><平台名>-节点A</td>
+            <td><span class="status-tag status-online">已上架</span></td>
+            <td>2026-06-11 14:33</td>
+            <td>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">查看</a>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">编辑</a>
+              <a href="#" style="color:#F53F3F;font-size:12px">下架</a>
+            </td>
+          </tr>
+          <tr>
+            <td>6</td><td>DS-2026-0006</td><td>公共信用评价结果</td>
+            <td>数据库</td><td>数链通-龙岩节点</td>
+            <td><span class="status-tag status-online">已上架</span></td>
+            <td>2026-06-10 08:55</td>
+            <td>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">查看</a>
+              <a href="#" style="color:#165DFF;font-size:12px;margin-right:8px">编辑</a>
+              <a href="#" style="color:#F53F3F;font-size:12px">下架</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== 右侧说明面板 ===== -->
+  <div class="doc-area" id="docPanel">
+    <h3>功能说明</h3>
+    <p class="subtitle">数据资源列表页 · 核心交互标注<br>色标圆点直接贴在标注目标上</p>
+    <div class="toggle-pins" id="togglePins" title="显示/隐藏左侧标注标签">
+      <span class="switch"></span>
+      <span class="toggle-label">显示标签</span>
+    </div>
+
+    <div class="doc-item" data-anchor="1">
+      <span class="doc-pin" style="background:#F53F3F">1</span>
+      <span class="doc-label">操作按钮区</span>
+      <div class="doc-desc">新增、批量导入、导出按钮聚合在筛选栏右侧，符合B端操作习惯。导入弹窗含"导入至"选择项</div>
+    </div>
+    <div class="doc-item" data-anchor="2">
+      <span class="doc-pin" style="background:#F53F3F">2</span>
+      <span class="doc-label">数据格式列</span>
+      <div class="doc-desc">严格对齐TC609 resourceFormat标准，支持电子表格、数据库、电子文件等分组</div>
+    </div>
+    <div class="doc-item" data-anchor="3">
+      <span class="doc-pin" style="background:#F53F3F">3</span>
+      <span class="doc-label">操作列展示</span>
+      <div class="doc-desc">操作列首位放"查看"，显性化查看入口。状态不同操作项差异化显示</div>
+    </div>
+    <div class="doc-item" data-anchor="4">
+      <span class="doc-pin" style="background:#F53F3F">4</span>
+      <span class="doc-label">状态标签</span>
+      <div class="doc-desc">已上架/已下架两种状态，去冗余中间态。颜色语义化：绿色=在线，红色=离线</div>
+    </div>
+    <div class="doc-item" data-anchor="5">
+      <span class="doc-pin" style="background:#F53F3F">5</span>
+      <span class="doc-label">账号认证状态卡片</span>
+      <div class="state-switcher" id="stateSwitcher">
+        <button data-state="verified" class="active">已认证</button>
+        <button data-state="unverified">未认证</button>
+        <button data-state="pending">认证中</button>
+        <button data-state="expired">已过期</button>
+      </div>
+      <div class="doc-desc" id="stateDesc">绿色边框+绿色徽章，展示法人名称、信用代码及有效期，已认证状态下操作按钮完整可见</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // 颜色映射
+  const COLORS = {
+    '1': '#F53F3F',
+    '2': '#F53F3F',
+    '3': '#F53F3F',
+    '4': '#F53F3F',
+    '5': '#F53F3F'
+  };
+
+  const productArea = document.getElementById('productArea');
+  const tableWrapper = document.getElementById('tableWrapper');
+  const docItems = document.querySelectorAll('.doc-item');
+  const docMap = {};
+  docItems.forEach(el => { docMap[el.dataset.anchor] = el; });
+
+  // 已创建的 pin 元素
+  const pinEls = {};
+  // 已标注的目标元素
+  const targetMap = {};
+
+  // 清除高亮
+  function clearHighlights() {
+    docItems.forEach(el => { el.classList.remove('highlight'); el.style.borderLeftColor = 'transparent'; });
+    Object.values(targetMap).forEach(el => { el.classList.remove('highlighted'); });
+  }
+
+  // 高亮
+  function highlight(anchor) {
+    clearHighlights();
+    if (!anchor) return;
+    const docEl = docMap[anchor];
+    if (docEl) {
+      docEl.classList.add('highlight');
+      const pinColor = docEl.querySelector('.doc-pin').style.background;
+      docEl.style.borderLeftColor = pinColor;
+    }
+    const target = targetMap[anchor];
+    if (target) target.classList.add('highlighted');
+  }
+
+  // 创建单个圆点
+  function createPin(anchor) {
+    const target = document.querySelector('.anchor-target[data-anchor="' + anchor + '"]');
+    if (!target) return;
+    targetMap[anchor] = target;
+
+    const pin = document.createElement('div');
+    pin.className = 'pin-overlay';
+    pin.style.background = COLORS[anchor];
+    pin.textContent = anchor;
+    document.body.appendChild(pin);
+    pinEls[anchor] = pin;
+
+    // hover 事件
+    pin.addEventListener('mouseenter', () => highlight(anchor));
+    pin.addEventListener('mouseleave', () => clearHighlights());
+    target.addEventListener('mouseenter', () => highlight(anchor));
+    target.addEventListener('mouseleave', () => clearHighlights());
+  }
+
+  // 更新圆点位置（fixed 定位，直接用视口坐标）
+  function updatePinPositions() {
+    Object.entries(pinEls).forEach(([anchor, pin]) => {
+      const target = targetMap[anchor];
+      if (!target) return;
+      const rect = target.getBoundingClientRect();
+      pin.style.left = (rect.right + 2) + 'px';
+      pin.style.top = (rect.top + rect.height / 2) + 'px';
+    });
+  }
+
+  // 初始化
+  ['1', '2', '3', '4', '5'].forEach(createPin);
+  updatePinPositions();
+
+  // 右侧说明区 hover
+  docItems.forEach(item => {
+    item.addEventListener('mouseenter', () => highlight(item.dataset.anchor));
+    item.addEventListener('mouseleave', () => clearHighlights());
+  });
+
+  // 状态切换：账号认证卡片
+  const authCard = document.getElementById('authCard');
+  const authBadge = document.getElementById('authBadge');
+  const stateDesc = document.getElementById('stateDesc');
+  const stateLabels = {
+    verified:   '已认证',
+    unverified: '未认证',
+    pending:    '认证中',
+    expired:    '已过期'
+  };
+  const stateDescs = {
+    verified:   '绿色边框+绿色徽章，展示法人名称、信用代码及有效期，已认证状态下操作按钮完整可见',
+    unverified: '灰色边框+灰色徽章，不展示有效期，底部提示"请完成实名认证"，操作按钮置灰不可用',
+    pending:    '橙色边框+橙色徽章，展示"预计3个工作日内完成审核"，有效期显示为"--"，操作按钮可用但带loading态',
+    expired:    '红色边框+红色徽章，展示已过期日期并标注"已过期"，操作按钮不可用，引导重新认证'
+  };
+
+  document.getElementById('stateSwitcher').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const state = btn.dataset.state;
+    // 更新按钮激活态
+    btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // 更新卡片样式
+    authCard.className = 'auth-card state-' + state;
+    authBadge.textContent = stateLabels[state];
+    // 更新描述
+    stateDesc.textContent = stateDescs[state];
+    // 更新圆点位置（卡片高度可能变化）
+    setTimeout(updatePinPositions, 50);
+  });
+
+  // 滚动和 resize 时重新计算位置
+  tableWrapper.addEventListener('scroll', updatePinPositions);
+  window.addEventListener('resize', updatePinPositions);
+
+  // 标签显隐切换
+  const togglePins = document.getElementById('togglePins');
+  const toggleLabel = togglePins.querySelector('.toggle-label');
+  let pinsVisible = true;
+  togglePins.addEventListener('click', () => {
+    pinsVisible = !pinsVisible;
+    if (pinsVisible) {
+      togglePins.classList.remove('off');
+      toggleLabel.textContent = '显示标签';
+      Object.values(pinEls).forEach(p => p.classList.remove('hidden'));
+    } else {
+      togglePins.classList.add('off');
+      toggleLabel.textContent = '隐藏标签';
+      Object.values(pinEls).forEach(p => p.classList.add('hidden'));
+    }
+  });
+})();
+</script>
+</body>
+</html>

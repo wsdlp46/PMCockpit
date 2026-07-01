@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手机端 极简黑白 设计系统 · 原型示例</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; overflow: hidden; background: #F5F5F5; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+    /* ===== 手机模拟框（真机外壳感） ===== */
+    .phone-frame {
+      width: 375px; height: 812px; flex-shrink: 0;
+      background: #FFFFFF; border-radius: 40px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12), 0 0 0 11px #1A1A1A, 0 0 0 12px #333;
+      overflow: hidden; position: relative;
+    }
+    .phone-screen { width: 100%; height: 100%; overflow-y: auto; background: #FFFFFF; position: relative; }
+    .phone-screen::-webkit-scrollbar { display: none; }
+    /* 顶部刘海 */
+    .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 28px; background: #1A1A1A; border-radius: 0 0 18px 18px; z-index: 20; }
+
+    /* ===== 设计令牌（来自 手机端-极简黑白-design.md） ===== */
+    /* 颜色 */
+    .c-ink { color: #000000; }
+    .c-ink1 { color: #1A1A1A; }
+    .c-sub { color: #999999; }
+    .c-faint { color: #BBBBBB; }
+    .bg-fill { background: #F5F5F5; }
+    .bg-dim { background: #1A1A1A; }
+
+    /* 字号字重（9节） */
+    .t-title { font-size: 17px; font-weight: 600; line-height: 1.3; }      /* 导航/区块标题 */
+    .t-card  { font-size: 15px; font-weight: 500; line-height: 1.4; }      /* 卡片标题/商品名 */
+    .t-body  { font-size: 15px; font-weight: 400; line-height: 1.5; }      /* 正文/输入 */
+    .t-cap   { font-size: 13px; font-weight: 400; line-height: 1.4; }      /* 辅助/状态 */
+    .t-big   { font-size: 32px; font-weight: 700; line-height: 1.2; }      /* 成功页大金额 */
+    .t-btn   { font-size: 16px; font-weight: 600; }
+
+    /* 圆角（13节） */
+    .r-md { border-radius: 12px; }     /* 卡片/输入/按钮 默认 */
+    .r-lg { border-radius: 16px; }     /* 大卡片 */
+    .r-xl { border-radius: 24px; }     /* 暗色弹层顶 */
+    .r-pill { border-radius: 26px; }   /* 胶囊 */
+
+    /* 组件 */
+    .card { background: #FFFFFF; border-radius: 12px; border: 1px solid #F0F0F0; padding: 16px; }
+    .btn-primary { background: #000000; color: #FFFFFF; height: 54px; border-radius: 12px; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; width: 100%; }
+    .btn-primary:active { opacity: 0.8; }
+    .btn-outline { background: #FFFFFF; color: #000000; height: 54px; border: 1.5px solid #000000; border-radius: 12px; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; width: 100%; }
+    .btn-text { color: #999999; font-size: 16px; font-weight: 500; }
+    .input-fill { background: #F5F5F5; border-radius: 12px; height: 52px; padding: 0 16px; font-size: 16px; color: #000000; width: 100%; border: 1.5px solid transparent; }
+    .input-fill:focus { outline: none; border-color: #000000; background: #FFFFFF; }
+    .row-divider { border-bottom: 1px solid #F5F5F5; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: middle; }
+
+    /* ===== 连线高亮 ===== */
+    .proto-element { position: relative; transition: all 0.2s ease; border-radius: 8px; }
+    .proto-element:hover, .proto-element.active-highlight { box-shadow: 0 0 0 2px #B45309; background-color: rgba(180,83,9,0.05); }
+    .proto-desc { transition: all 0.2s ease; border-radius: 8px; border: 1px solid #fde68a; background-color: #fffbeb; }
+    .proto-desc:hover { background-color: #fef3c7; border-color: #f59e0b; }
+    .proto-desc.active-highlight { background-color: #fde68a; border-color: #d97706; }
+    .proto-element.active-highlight .card { box-shadow: 0 0 0 2px #B45309; }
+
+    /* SVG 连线层 */
+    #connections { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+    .connection-line { fill: none; stroke: #B45309; stroke-width: 2; opacity: 0.55; transition: all 0.2s ease; }
+    .connection-line.active { stroke-width: 3; opacity: 1; }
+    .connection-label { fill: #fff; font-size: 11px; font-weight: bold; text-anchor: middle; dominant-baseline: central; }
+    .connection-label-bg { fill: #B45309; }
+
+    /* 手机画廊滚动 */
+    .gallery { display: flex; gap: 32px; padding: 40px 40px 60px; width: max-content; }
+    .phone-label { text-align: center; margin-top: 16px; font-size: 13px; color: #999999; font-weight: 500; }
+
+    .mobile-toggle-btn { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 100; width: 48px; height: 48px; border-radius: 50%; background: #B45309; color: white; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(180,83,9,0.3); cursor: pointer; border: none; }
+
+    @media (max-width: 900px) {
+      #app { flex-direction: column; }
+      #left-panel { width: 100% !important; height: 65vh; }
+      #divider { display: none; }
+      #right-panel { width: 100% !important; height: 35vh; border-top: 1px solid #e5e7eb; }
+      #connections { display: none; }
+      .mobile-toggle-btn { display: flex; }
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <button class="mobile-toggle-btn" id="mobileToggle" onclick="toggleMobileView()">
+    <i class="fas fa-info"></i>
+  </button>
+
+  <div id="app" class="flex h-screen relative">
+
+    <!-- ============ 左侧：手机画廊 ============ -->
+    <div id="left-panel" class="overflow-y-auto relative" style="width:78%;">
+
+      <!-- 顶部说明条 -->
+      <div class="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-gray-200 px-8 py-3 flex items-center justify-between">
+        <div>
+          <h1 class="text-base font-semibold text-gray-900">手机端 极简黑白 设计系统</h1>
+          <p class="text-xs text-gray-500 mt-0.5">参照 <code class="text-amber-700 bg-amber-50 px-1 rounded">手机端-极简黑白-design.md</code> · 主操作色 #000000 · 圆角 12px · 8点网格</p>
+        </div>
+        <span class="text-xs text-gray-400"><i class="fas fa-mouse-pointer mr-1"></i>悬停下方元素可高亮连线</span>
+      </div>
+
+      <div class="gallery">
+
+        <!-- ============ 屏 1：My Orders ============ -->
+        <div>
+          <div class="phone-frame">
+            <div class="notch"></div>
+            <div class="phone-screen">
+              <!-- 状态栏 -->
+              <div class="flex items-center justify-between px-6 pt-3 pb-1 text-[15px] font-medium c-ink1">
+                <span>9:41</span>
+                <span class="flex items-center gap-1.5"><i class="fas fa-signal text-xs"></i><i class="fas fa-wifi text-xs"></i><i class="fas fa-battery-full text-sm"></i></span>
+              </div>
+              <!-- 导航栏 -->
+              <div class="flex items-center justify-between px-5 h-14">
+                <button class="c-ink text-xl"><i class="fas fa-arrow-left"></i></button>
+                <span class="t-title c-ink">My Orders</span>
+                <span class="w-6"></span>
+              </div>
+              <!-- Tab 切换 -->
+              <div class="flex px-5 gap-6 border-b border-[#F0F0F0]">
+                <div class="pb-3 text-[15px] font-semibold c-ink border-b-2 border-black -mb-px">Active</div>
+                <div class="pb-3 text-[15px] font-normal c-sub">Completed</div>
+              </div>
+
+              <!-- 订单卡（连线 1：商品行卡片） -->
+              <div class="proto-element px-5 pt-4" data-proto-id="1">
+                <div class="card">
+                  <div class="flex justify-between items-center mb-3">
+                    <span class="text-[13px] c-sub">Order #ORD-8842</span>
+                    <span class="text-[13px] font-medium c-ink flex items-center"><span class="status-dot" style="background:#000"></span>In Transit</span>
+                  </div>
+                  <div class="flex gap-3">
+                    <div class="w-16 h-16 bg-fill r-md flex items-center justify-center text-2xl"><i class="fas fa-box c-sub"></i></div>
+                    <div class="flex-1">
+                      <div class="t-card c-ink1">Wireless Headphones Pro</div>
+                      <div class="t-cap c-sub mt-1">Qty: 1 · Black</div>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-[15px] font-semibold c-ink">$129.00</div>
+                      <div class="t-cap c-sub mt-1">2 items</div>
+                    </div>
+                  </div>
+                  <button class="btn-outline mt-4" style="height:42px;font-size:14px;">Track Order</button>
+                </div>
+              </div>
+
+              <div class="px-5 pt-3">
+                <div class="card">
+                  <div class="flex justify-between items-center mb-3">
+                    <span class="text-[13px] c-sub">Order #ORD-8839</span>
+                    <span class="text-[13px] font-medium c-ink flex items-center"><span class="status-dot" style="background:#000"></span>Packing</span>
+                  </div>
+                  <div class="flex gap-3">
+                    <div class="w-16 h-16 bg-fill r-md flex items-center justify-center text-2xl"><i class="fas fa-mug-hot c-sub"></i></div>
+                    <div class="flex-1">
+                      <div class="t-card c-ink1">Ceramic Coffee Mug Set</div>
+                      <div class="t-cap c-sub mt-1">Qty: 2 · White</div>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-[15px] font-semibold c-ink">$48.00</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="height:40px;"></div>
+            </div>
+          </div>
+          <div class="phone-label">① My Orders · 订单列表</div>
+        </div>
+
+        <!-- ============ 屏 2：My E-Wallet ============ -->
+        <div>
+          <div class="phone-frame">
+            <div class="notch"></div>
+            <div class="phone-screen">
+              <div class="flex items-center justify-between px-6 pt-3 pb-1 text-[15px] font-medium c-ink1">
+                <span>9:41</span>
+                <span class="flex items-center gap-1.5"><i class="fas fa-signal text-xs"></i><i class="fas fa-wifi text-xs"></i><i class="fas fa-battery-full text-sm"></i></span>
+              </div>
+              <div class="flex items-center justify-between px-5 h-14">
+                <button class="c-ink text-xl"><i class="fas fa-arrow-left"></i></button>
+                <span class="t-title c-ink">My E-Wallet</span>
+                <span class="w-6"></span>
+              </div>
+
+              <!-- 余额大数字（连线 2） -->
+              <div class="proto-element px-5 pt-2" data-proto-id="2">
+                <div class="card bg-fill" style="border:none;">
+                  <div class="text-[13px] c-sub mb-2">Available Balance</div>
+                  <div class="t-big c-ink">$1,248.50</div>
+                  <button class="btn-primary mt-5">Top Up</button>
+                </div>
+              </div>
+
+              <!-- 流水列表 -->
+              <div class="px-5 pt-6">
+                <div class="flex justify-between items-center mb-3">
+                  <span class="t-title c-ink">Transactions</span>
+                  <span class="text-[13px] c-sub">See all</span>
+                </div>
+                <div class="flex items-center gap-3 py-3 row-divider">
+                  <div class="w-10 h-10 bg-fill r-md flex items-center justify-center"><i class="fas fa-arrow-up c-ink"></i></div>
+                  <div class="flex-1">
+                    <div class="t-card c-ink1">Top Up</div>
+                    <div class="t-cap c-sub">Today, 14:32</div>
+                  </div>
+                  <div class="text-[15px] font-semibold c-ink">+$200.00</div>
+                </div>
+                <div class="flex items-center gap-3 py-3 row-divider">
+                  <div class="w-10 h-10 bg-fill r-md flex items-center justify-center"><i class="fas fa-shopping-bag c-sub"></i></div>
+                  <div class="flex-1">
+                    <div class="t-card c-ink1">Order Payment</div>
+                    <div class="t-cap c-sub">Yesterday</div>
+                  </div>
+                  <div class="text-[15px] font-semibold c-sub">-$129.00</div>
+                </div>
+              </div>
+              <div style="height:40px;"></div>
+            </div>
+          </div>
+          <div class="phone-label">② My E-Wallet · 钱包首页</div>
+        </div>
+
+        <!-- ============ 屏 3：Top Up E-Wallet ============ -->
+        <div>
+          <div class="phone-frame">
+            <div class="notch"></div>
+            <div class="phone-screen">
+              <div class="flex items-center justify-between px-6 pt-3 pb-1 text-[15px] font-medium c-ink1">
+                <span>9:41</span>
+                <span class="flex items-center gap-1.5"><i class="fas fa-signal text-xs"></i><i class="fas fa-wifi text-xs"></i><i class="fas fa-battery-full text-sm"></i></span>
+              </div>
+              <div class="flex items-center justify-between px-5 h-14">
+                <button class="c-ink text-xl"><i class="fas fa-arrow-left"></i></button>
+                <span class="t-title c-ink">Top Up E-Wallet</span>
+                <span class="w-6"></span>
+              </div>
+
+              <div class="px-5 pt-2">
+                <div class="t-cap c-sub mb-3">Enter Amount</div>
+                <!-- 金额选择按钮组（连线 3） -->
+                <div class="proto-element" data-proto-id="3">
+                  <div class="grid grid-cols-3 gap-3">
+                    <div class="h-14 r-md flex items-center justify-center text-[17px] font-medium c-ink bg-white" style="border:1.5px solid #E5E5E5;">$20</div>
+                    <div class="h-14 r-md flex items-center justify-center text-[17px] font-semibold c-ink bg-white" style="border:1.5px solid #000000;">$50</div>
+                    <div class="h-14 r-md flex items-center justify-center text-[17px] font-medium c-ink bg-white" style="border:1.5px solid #E5E5E5;">$100</div>
+                    <div class="h-14 r-md flex items-center justify-center text-[17px] font-medium c-ink bg-white" style="border:1.5px solid #E5E5E5;">$200</div>
+                    <div class="h-14 r-md flex items-center justify-center text-[17px] font-medium c-ink bg-white" style="border:1.5px solid #E5E5E5;">$500</div>
+                    <div class="h-14 r-md flex items-center justify-center text-[15px] font-medium c-sub bg-white" style="border:1.5px solid #E5E5E5;">Other</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 支付方式（连线 4） -->
+              <div class="px-5 pt-7">
+                <div class="t-cap font-medium c-sub mb-3">PAYMENT METHOD</div>
+                <div class="proto-element" data-proto-id="4">
+                  <div class="flex items-center gap-3 py-4 row-divider">
+                    <div class="w-8 h-8 rounded flex items-center justify-center text-white text-xs font-bold" style="background:#000;">★</div>
+                    <span class="flex-1 t-card c-ink1">E-Wallet</span>
+                    <span class="w-6 h-6 rounded-full bg-black flex items-center justify-center"><i class="fas fa-check text-white text-[10px]"></i></span>
+                  </div>
+                  <div class="flex items-center gap-3 py-4 row-divider">
+                    <div class="w-8 h-8 rounded flex items-center justify-center text-white text-xs font-bold" style="background:#E07000;">Visa</div>
+                    <span class="flex-1 t-card c-ink1">•••• 4829</span>
+                    <span class="w-6 h-6 rounded-full" style="border:1.5px solid #E5E5E5;"></span>
+                  </div>
+                  <div class="flex items-center gap-3 py-4">
+                    <div class="w-8 h-8 rounded flex items-center justify-center text-white text-xs font-bold" style="background:#0070BA;">PP</div>
+                    <span class="flex-1 t-card c-ink1">PayPal</span>
+                    <span class="w-6 h-6 rounded-full" style="border:1.5px solid #E5E5E5;"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="px-5 mt-6">
+                <button class="btn-primary">Continue · $50</button>
+              </div>
+              <div style="height:40px;"></div>
+            </div>
+          </div>
+          <div class="phone-label">③ Top Up E-Wallet · 充值</div>
+        </div>
+
+        <!-- ============ 屏 4：Enter PIN ============ -->
+        <div>
+          <div class="phone-frame">
+            <div class="notch"></div>
+            <div class="phone-screen">
+              <div class="flex items-center justify-between px-6 pt-3 pb-1 text-[15px] font-medium c-ink1">
+                <span>9:41</span>
+                <span class="flex items-center gap-1.5"><i class="fas fa-signal text-xs"></i><i class="fas fa-wifi text-xs"></i><i class="fas fa-battery-full text-sm"></i></span>
+              </div>
+              <div class="flex items-center justify-between px-5 h-14">
+                <button class="c-ink text-xl"><i class="fas fa-arrow-left"></i></button>
+                <span class="t-title c-ink">Enter Your PIN</span>
+                <span class="w-6"></span>
+              </div>
+
+              <div class="text-center pt-10 px-8">
+                <div class="w-16 h-16 mx-auto bg-fill r-lg flex items-center justify-center mb-5"><i class="fas fa-lock c-ink text-2xl"></i></div>
+                <p class="t-body c-ink1">Enter your 4-digit PIN to confirm</p>
+                <p class="t-cap c-sub mt-1">Topping up <span class="font-semibold c-ink">$50.00</span></p>
+              </div>
+
+              <!-- PIN 格（连线 5） -->
+              <div class="proto-element flex justify-center gap-4 pt-10" data-proto-id="5">
+                <div class="w-14 h-14 r-md bg-fill flex items-center justify-center"><span class="text-2xl font-semibold c-ink">•</span></div>
+                <div class="w-14 h-14 r-md bg-fill flex items-center justify-center"><span class="text-2xl font-semibold c-ink">•</span></div>
+                <div class="w-14 h-14 r-md bg-fill flex items-center justify-center"><span class="text-2xl font-semibold c-ink">•</span></div>
+                <div class="w-14 h-14 r-md flex items-center justify-center" style="border:1.5px solid #000000;"><span class="w-2 h-5 bg-black animate-pulse"></span></div>
+              </div>
+
+              <div class="text-center pt-8">
+                <button class="btn-text">Forgot PIN?</button>
+              </div>
+              <div style="height:40px;"></div>
+            </div>
+          </div>
+          <div class="phone-label">④ Enter PIN · 密码确认</div>
+        </div>
+
+        <!-- ============ 屏 5：Top Up Successful（暗色弹层） ============ -->
+        <div>
+          <div class="phone-frame">
+            <div class="notch"></div>
+            <div class="phone-screen bg-dim">
+              <div class="flex items-center justify-between px-6 pt-3 pb-1 text-[15px] font-medium text-white">
+                <span>9:41</span>
+                <span class="flex items-center gap-1.5"><i class="fas fa-signal text-xs"></i><i class="fas fa-wifi text-xs"></i><i class="fas fa-battery-full text-sm"></i></span>
+              </div>
+
+              <!-- 暗色弹层内容（连线 6） -->
+              <div class="proto-element px-6 pt-16" data-proto-id="6">
+                <div class="text-center">
+                  <div class="w-20 h-20 mx-auto rounded-full bg-white flex items-center justify-center mb-7"><i class="fas fa-check text-black text-3xl"></i></div>
+                  <h2 class="text-[24px] font-semibold text-white">Top Up Successful</h2>
+                  <p class="t-cap mt-2" style="color:rgba(255,255,255,0.7);">Your wallet has been topped up</p>
+
+                  <div class="t-big text-white mt-8">$50.00</div>
+
+                  <!-- 详情卡（暗底用更深的层） -->
+                  <div class="r-lg p-5 mt-8 text-left" style="background:#2A2A2A;">
+                    <div class="flex justify-between py-2">
+                      <span class="t-cap" style="color:rgba(255,255,255,0.6);">Amount</span>
+                      <span class="t-card text-white">$50.00</span>
+                    </div>
+                    <div class="flex justify-between py-2" style="border-top:1px solid rgba(255,255,255,0.1);">
+                      <span class="t-cap" style="color:rgba(255,255,255,0.6);">Fee</span>
+                      <span class="t-card text-white">$0.00</span>
+                    </div>
+                    <div class="flex justify-between py-2" style="border-top:1px solid rgba(255,255,255,0.1);">
+                      <span class="t-cap" style="color:rgba(255,255,255,0.6);">New Balance</span>
+                      <span class="t-card text-white font-semibold">$1,298.50</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="px-6 mt-8 space-y-3">
+                <button class="r-pill text-black bg-white font-semibold" style="height:54px;width:100%;">Done</button>
+                <button class="r-pill font-medium text-white" style="height:54px;width:100%;border:1.5px solid #FFFFFF;">View E-Receipt</button>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">⑤ Top Up Successful · 暗色弹层</div>
+        </div>
+
+        <!-- ============ 屏 6：Profile ============ -->
+        <div>
+          <div class="phone-frame">
+            <div class="notch"></div>
+            <div class="phone-screen">
+              <div class="flex items-center justify-between px-6 pt-3 pb-1 text-[15px] font-medium c-ink1">
+                <span>9:41</span>
+                <span class="flex items-center gap-1.5"><i class="fas fa-signal text-xs"></i><i class="fas fa-wifi text-xs"></i><i class="fas fa-battery-full text-sm"></i></span>
+              </div>
+              <div class="flex items-center justify-between px-5 h-14">
+                <button class="c-ink text-xl"><i class="fas fa-arrow-left"></i></button>
+                <span class="t-title c-ink">Profile</span>
+                <button class="text-[15px] font-medium c-ink">Edit</button>
+              </div>
+
+              <!-- 头像区 -->
+              <div class="flex flex-col items-center pt-4 pb-6">
+                <div class="w-20 h-20 rounded-full bg-fill flex items-center justify-center mb-3"><i class="fas fa-user c-sub text-3xl"></i></div>
+                <div class="t-title c-ink">Alex Morgan</div>
+                <div class="t-cap c-sub mt-1">alex.morgan@email.com</div>
+              </div>
+
+              <!-- 设置项分组（连线 7） -->
+              <div class="px-5">
+                <div class="t-cap font-medium c-sub mb-2 ml-1">ACCOUNT</div>
+                <div class="proto-element card p-0 overflow-hidden" data-proto-id="7">
+                  <div class="flex items-center gap-3 px-4" style="height:56px;">
+                    <i class="fas fa-wallet c-ink w-6 text-center"></i>
+                    <span class="flex-1 t-card c-ink1">My E-Wallet</span>
+                    <span class="t-cap c-sub mr-1">$1,248.50</span>
+                    <i class="fas fa-chevron-right text-[13px] c-faint"></i>
+                  </div>
+                  <div class="flex items-center gap-3 px-4 row-divider" style="height:56px;">
+                    <i class="fas fa-map-marker-alt c-ink w-6 text-center"></i>
+                    <span class="flex-1 t-card c-ink1">Address</span>
+                    <i class="fas fa-chevron-right text-[13px] c-faint"></i>
+                  </div>
+                  <div class="flex items-center gap-3 px-4" style="height:56px;">
+                    <i class="fas fa-credit-card c-ink w-6 text-center"></i>
+                    <span class="flex-1 t-card c-ink1">Payment Methods</span>
+                    <i class="fas fa-chevron-right text-[13px] c-faint"></i>
+                  </div>
+                </div>
+
+                <div class="t-cap font-medium c-sub mb-2 ml-1 mt-6">SETTINGS</div>
+                <div class="card p-0 overflow-hidden">
+                  <div class="flex items-center gap-3 px-4" style="height:56px;">
+                    <i class="fas fa-bell c-ink w-6 text-center"></i>
+                    <span class="flex-1 t-card c-ink1">Notifications</span>
+                    <!-- 开关 -->
+                    <div class="w-[52px] h-8 r-pill bg-black flex items-center justify-end px-0.5"><div class="w-7 h-7 rounded-full bg-white"></div></div>
+                  </div>
+                  <div class="flex items-center gap-3 px-4 row-divider" style="height:56px;">
+                    <i class="fas fa-shield-alt c-ink w-6 text-center"></i>
+                    <span class="flex-1 t-card c-ink1">Security</span>
+                    <i class="fas fa-chevron-right text-[13px] c-faint"></i>
+                  </div>
+                </div>
+
+                <div class="pt-6 pb-8">
+                  <button class="w-full text-[16px] font-semibold r-md" style="height:54px;color:#E02424;background:#FFF1F0;">Log Out</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="phone-label">⑥ Profile · 个人中心</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 分隔线 -->
+    <div id="divider" class="w-px bg-gray-300"></div>
+
+    <!-- ============ 右侧：设计说明（琥珀色） ============ -->
+    <div id="right-panel" class="overflow-y-auto bg-amber-50 border-l-2 border-dashed border-amber-300" style="width:22%;">
+      <div class="p-5">
+        <div class="mb-4 p-3 bg-amber-100 border border-amber-300 rounded-lg">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="px-2 py-0.5 bg-amber-600 text-white text-[10px] font-bold rounded uppercase tracking-wide">Design Spec</span>
+            <span class="text-xs font-semibold text-amber-800">设计令牌对照</span>
+          </div>
+          <p class="text-[11px] text-amber-700 leading-relaxed">左侧 6 屏均严格遵循 <b>手机端-极简黑白-design.md</b> 的参数。悬停编号说明可高亮对应组件。</p>
+        </div>
+
+        <div class="flex items-center gap-2 mb-4 pb-3 border-b border-amber-200">
+          <i class="fas fa-palette text-amber-600"></i>
+          <h2 class="text-sm font-bold text-amber-900">核心设计令牌</h2>
+        </div>
+
+        <div class="space-y-3">
+
+          <div class="proto-desc p-3" data-proto-id="1">
+            <div class="flex items-start gap-2">
+              <span class="flex-shrink-0 w-6 h-6 bg-amber-500 text-white rounded-full text-xs font-bold flex items-center justify-center">1</span>
+              <div>
+                <h3 class="text-sm font-semibold text-gray-800">商品/订单行卡片</h3>
+                <p class="text-xs text-gray-600 mt-1">缩略图 64px·圆角8px + 中间 flex:1 信息 + 右侧价格。状态用<b>文字+小圆点</b>，不用彩色徽章，保持黑白基调。</p>
+                <p class="text-[10px] text-amber-700 mt-1.5 font-mono">3.2节 · 7.1状态文字</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="proto-desc p-3" data-proto-id="2">
+            <div class="flex items-start gap-2">
+              <span class="flex-shrink-0 w-6 h-6 bg-amber-500 text-white rounded-full text-xs font-bold flex items-center justify-center">2</span>
+              <div>
+                <h3 class="text-sm font-semibold text-gray-800">余额大数字 + 主按钮</h3>
+                <p class="text-xs text-gray-600 mt-1">大数字 <b>32px/700</b>，纯黑实心按钮 <b>#000000</b>、高54px、圆角12px。灰底填充卡 #F5F5F5。</p>
+                <p class="text-[10px] text-amber-700 mt-1.5 font-mono">5.1主按钮 · 3.1卡片 · 9字体</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="proto-desc p-3" data-proto-id="3">
+            <div class="flex items-start gap-2">
+              <span class="flex-shrink-0 w-6 h-6 bg-amber-500 text-white rounded-full text-xs font-bold flex items-center justify-center">3</span>
+              <div>
+                <h3 class="text-sm font-semibold text-gray-800">金额选择按钮组</h3>
+                <p class="text-xs text-gray-600 mt-1">3列网格 gap 12px。默认 1.5px <b>#E5E5E5</b> 描边；选中态描边变 <b>#000000</b>、字重600——仅靠描边与字重表达选中，不填色。</p>
+                <p class="text-[10px] text-amber-700 mt-1.5 font-mono">4.2节</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="proto-desc p-3" data-proto-id="4">
+            <div class="flex items-start gap-2">
+              <span class="flex-shrink-0 w-6 h-6 bg-amber-500 text-white rounded-full text-xs font-bold flex items-center justify-center">4</span>
+              <div>
+                <h3 class="text-sm font-semibold text-gray-800">支付方式单选行</h3>
+                <p class="text-xs text-gray-600 mt-1">行高60px，右侧 24px 单选圈：未选 #E5E5E5 描边，选中 <b>#000000 实心+白对勾</b>。分隔线 #F5F5F5。</p>
+                <p class="text-[10px] text-amber-700 mt-1.5 font-mono">4.3节</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="proto-desc p-3" data-proto-id="5">
+            <div class="flex items-start gap-2">
+              <span class="flex-shrink-0 w-6 h-6 bg-amber-500 text-white rounded-full text-xs font-bold flex items-center justify-center">5</span>
+              <div>
+                <h3 class="text-sm font-semibold text-gray-800">PIN 输入格</h3>
+                <p class="text-xs text-gray-600 mt-1">单格 <b>56×56px</b>、圆角12px、灰底#F5F5F5、间距16px。已填用圆点(•)替代数字，当前格描黑边+光标。</p>
+                <p class="text-[10px] text-amber-700 mt-1.5 font-mono">4.4节</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="proto-desc p-3" data-proto-id="6">
+            <div class="flex items-start gap-2">
+              <span class="flex-shrink-0 w-6 h-6 bg-amber-500 text-white rounded-full text-xs font-bold flex items-center justify-center">6</span>
+              <div>
+                <h3 class="text-sm font-semibold text-gray-800">暗色成功弹层</h3>
+                <p class="text-xs text-gray-600 mt-1">背景 <b>#1A1A1A</b>，按钮<b>反白</b>：主按钮白底黑字、次按钮白描边。内层详情卡用更深 #2A2A2A 分层。与白底页形成强对比。</p>
+                <p class="text-[10px] text-amber-700 mt-1.5 font-mono">6节 · 7.3成功页</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="proto-desc p-3" data-proto-id="7">
+            <div class="flex items-start gap-2">
+              <span class="flex-shrink-0 w-6 h-6 bg-amber-500 text-white rounded-full text-xs font-bold flex items-center justify-center">7</span>
+              <div>
+                <h3 class="text-sm font-semibold text-gray-800">设置项分组列表</h3>
+                <p class="text-xs text-gray-600 mt-1">行高56px、线性图标24px黑、右侧箭头#CCCCCC。分组标题13px/500 #999999。开关 52×32px 胶囊，开黑关灰。</p>
+                <p class="text-[10px] text-amber-700 mt-1.5 font-mono">3.3节 · 4.5开关</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 速查表 -->
+        <div class="mt-6 p-4 bg-white border border-amber-200 rounded-lg">
+          <h3 class="text-xs font-bold text-amber-900 mb-2 flex items-center gap-1"><i class="fas fa-table"></i> 令牌速查</h3>
+          <table class="w-full text-[11px] text-gray-600">
+            <tr class="border-b border-amber-100"><td class="py-1">主操作色</td><td class="py-1 font-mono text-right">#000000</td></tr>
+            <tr class="border-b border-amber-100"><td class="py-1">页面背景</td><td class="py-1 font-mono text-right">#FFFFFF</td></tr>
+            <tr class="border-b border-amber-100"><td class="py-1">灰底填充</td><td class="py-1 font-mono text-right">#F5F5F5</td></tr>
+            <tr class="border-b border-amber-100"><td class="py-1">主圆角</td><td class="py-1 font-mono text-right">12px</td></tr>
+            <tr class="border-b border-amber-100"><td class="py-1">主按钮高</td><td class="py-1 font-mono text-right">54px</td></tr>
+            <tr class="border-b border-amber-100"><td class="py-1">导航栏高</td><td class="py-1 font-mono text-right">56px</td></tr>
+            <tr class="border-b border-amber-100"><td class="py-1">正文/按钮</td><td class="py-1 font-mono text-right">15-16px</td></tr>
+            <tr><td class="py-1">间距单位</td><td class="py-1 font-mono text-right">8pt网格</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SVG 连线层 -->
+  <svg id="connections" class="absolute top-0 left-0 w-full h-full pointer-events-none"></svg>
+
+  <script>
+    const svg = document.getElementById('connections');
+    const connections = [];
+
+    function drawConnections() {
+      svg.innerHTML = '';
+      connections.length = 0;
+      const leftElements = document.querySelectorAll('.proto-element[data-proto-id]');
+      const rightElements = document.querySelectorAll('.proto-desc[data-proto-id]');
+
+      leftElements.forEach(leftEl => {
+        const protoId = leftEl.getAttribute('data-proto-id');
+        const rightEl = document.querySelector(`.proto-desc[data-proto-id="${protoId}"]`);
+        if (!rightEl) return;
+        // 只对可见（在视口画廊内）的元素连线
+        const leftRect = leftEl.getBoundingClientRect();
+        const rightRect = rightEl.getBoundingClientRect();
+        const svgRect = svg.getBoundingClientRect();
+
+        // 右侧锚点固定在面板中线区域，左锚点为元素右边缘
+        const x1 = leftRect.right - svgRect.left;
+        const y1 = leftRect.top + leftRect.height / 2 - svgRect.top;
+        const x2 = rightRect.left - svgRect.left;
+        const y2 = rightRect.top + rightRect.height / 2 - svgRect.top;
+
+        // 元素若在视口外（左侧画廊滚动走）则跳过绘制，避免长跨页线
+        if (y1 < -200 || y1 > svgRect.height + 200) {
+          connections.push({ protoId, path: null, leftEl, rightEl });
+          return;
+        }
+
+        const cp1x = x1 + (x2 - x1) * 0.5;
+        const cp2x = x1 + (x2 - x1) * 0.5;
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M ${x1} ${y1} C ${cp1x} ${y1}, ${cp2x} ${y2}, ${x2} ${y2}`);
+        path.setAttribute('class', 'connection-line');
+        path.setAttribute('data-proto-id', protoId);
+        svg.appendChild(path);
+
+        const midX = (x1 + x2) / 2, midY = (y1 + y2) / 2;
+        const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        bg.setAttribute('cx', midX); bg.setAttribute('cy', midY); bg.setAttribute('r', 11);
+        bg.setAttribute('class', 'connection-label-bg'); svg.appendChild(bg);
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', midX); text.setAttribute('y', midY); text.setAttribute('dy', '0.05em');
+        text.setAttribute('class', 'connection-label'); text.textContent = protoId; svg.appendChild(text);
+
+        connections.push({ protoId, path, leftEl, rightEl });
+      });
+    }
+
+    function highlightConnection(protoId, active) {
+      const conn = connections.find(c => c.protoId === protoId);
+      if (!conn) return;
+      if (active) {
+        conn.path && conn.path.classList.add('active');
+        conn.leftEl.classList.add('active-highlight');
+        conn.rightEl.classList.add('active-highlight');
+      } else {
+        conn.path && conn.path.classList.remove('active');
+        conn.leftEl.classList.remove('active-highlight');
+        conn.rightEl.classList.remove('active-highlight');
+      }
+    }
+
+    function bindHoverEvents() {
+      document.querySelectorAll('.proto-element[data-proto-id]').forEach(el => {
+        el.addEventListener('mouseenter', () => highlightConnection(el.getAttribute('data-proto-id'), true));
+        el.addEventListener('mouseleave', () => highlightConnection(el.getAttribute('data-proto-id'), false));
+      });
+      document.querySelectorAll('.proto-desc[data-proto-id]').forEach(el => {
+        el.addEventListener('mouseenter', () => highlightConnection(el.getAttribute('data-proto-id'), true));
+        el.addEventListener('mouseleave', () => highlightConnection(el.getAttribute('data-proto-id'), false));
+      });
+    }
+
+    let mobileShowDesc = false;
+    function toggleMobileView() {
+      mobileShowDesc = !mobileShowDesc;
+      const leftPanel = document.getElementById('left-panel');
+      const rightPanel = document.getElementById('right-panel');
+      const btn = document.getElementById('mobileToggle');
+      if (mobileShowDesc) {
+        leftPanel.style.display = 'none'; rightPanel.style.height = '100vh'; btn.innerHTML = '<i class="fas fa-desktop"></i>';
+      } else {
+        leftPanel.style.display = ''; rightPanel.style.height = ''; btn.innerHTML = '<i class="fas fa-info"></i>';
+      }
+    }
+
+    function init() { drawConnections(); bindHoverEvents(); }
+    document.addEventListener('DOMContentLoaded', () => { setTimeout(init, 200); });
+    let resizeTimer;
+    window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(drawConnections, 150); });
+    document.getElementById('left-panel').addEventListener('scroll', () => { requestAnimationFrame(drawConnections); });
+    document.getElementById('right-panel').addEventListener('scroll', () => { requestAnimationFrame(drawConnections); });
+  </script>
+</body>
+</html>
