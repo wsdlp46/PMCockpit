@@ -1,6 +1,6 @@
 # 示例项目
 
-这里是一个最小可运行的项目骨架 `demo-management-system/`，演示 PRDCraft 的标准项目结构。
+这里是一个最小可运行的项目骨架 `demo-management-system/`，演示 PMCockpit 的标准项目结构。
 
 ## 怎么用
 
