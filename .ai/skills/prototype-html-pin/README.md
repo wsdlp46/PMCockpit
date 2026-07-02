@@ -44,7 +44,7 @@
 cd ~/Skills && bash install.sh
 
 # 或手动复制到工具的 skills 目录
-cp -r prototype-html-pin ~/.workbuddy/skills/
+bash .ai/install.sh
 ```
 
 适用于任何支持 Skill 机制的 AI 工具（如 CodeBuddy、WorkBuddy、Cursor 等）。
