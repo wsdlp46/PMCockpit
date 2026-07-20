@@ -17,7 +17,7 @@ PMCockpit 的解法是 **把规范变成 AI 能读的 skills**：不写零散提
 
 - **7 个独立 skill 按关键词自动触发**：说"开始新版本"触发建目录骨架；说"画这个页面"触发原型生成；说"上传 TAPD"触发需求拆分。不用手动 @ 任何文件。每个 skill 独立仓库，可单独升级、按需安装。
 - **AGENTS.md 统一写作纪律**：12 条文档生成纪律（完整性校验、编号一致性、角色带边界、页面编号前缀统一等）全局生效，AI 产出的文档天然规范。
-- **三工具适配**：ZCode、Claude Code、Codex 都能用，一条 `install.sh` 自动软链到对应工具目录。
+- **多工具适配**：ZCode、Claude Code、WorkBuddy、Codex 都能用，一条 `install.sh` 自动检测并装到对应工具目录。
 - **结构化规则而非提示词**：设计规范、检查清单、模板都是独立文件，AI 执行 skill 时编程式引用，不是塞进一段超长 prompt。
 
 ## Quick Start（3 步）
@@ -38,7 +38,7 @@ bash .ai/install.sh
 
 AI 会引导你确认版本号、复制上版资产、剥离出干净的目录骨架。然后你就可以开始写需求、画原型了。
 
-> 前置条件：已安装 [ZCode](https://zcode.com) 或 [Claude Code](https://claude.ai/code)（skill 自动触发需要其中之一）。Codex CLI 也可用，但 skill 不会自动触发，需手动 @ 引用。
+> 前置条件：已安装 ZCode、Claude Code、WorkBuddy 其中之一（skill 自动触发需要这三者之一）。Codex CLI 也可用，但 skill 不会自动触发，需手动 @ 引用。
 
 ## 适合谁
 
@@ -56,7 +56,7 @@ clone 后你得到一个完整的工作区骨架，直接在里面建项目：
 ├── AGENTS.md                   ← 工作区级 AI 指令（写作纪律、硬约束）
 ├── .ai/
 │   ├── install.sh              ← 一键安装，软链 agents 并引导克隆技能仓库
-│   ├── TOOL-MAPPING.md         ← 三工具加载差异说明
+│   ├── TOOL-MAPPING.md         ← 各工具加载差异说明
 │   └── agents/                 ← 文档撰写专用 agent（prd-writer、solution-designer）
 │                                  注：7 个核心 skill 是独立仓库，不在本仓库内，
 │                                  清单见下方"技能生态"，由 install.sh 引导克隆
@@ -85,7 +85,7 @@ clone 后你得到一个完整的工作区骨架，直接在里面建项目：
 
 ## 技能生态
 
-7 个核心 skill 各自独立仓库维护，按需克隆到 AI 工具的 skills 目录（ZCode 是 `~/.zcode/skills/`，Claude Code 是 `~/.claude/skills/`）。每个 skill 可独立升级，互不影响。
+7 个核心 skill 各自独立仓库维护，按需克隆到 AI 工具的 skills 目录（ZCode 是 `~/.zcode/skills/`，Claude Code 是 `~/.claude/skills/`，WorkBuddy 是 `~/.workbuddy/skills/`）。每个 skill 可独立升级，互不影响。
 
 | Skill | 仓库 | 触发词 | 职责 |
 |-------|------|--------|------|
@@ -101,6 +101,8 @@ clone 后你得到一个完整的工作区骨架，直接在里面建项目：
 - `prd-writer`：调用独立的 [wsdlp46/prd-writer](https://github.com/wsdlp46/prd-writer) skill 执行 PRD 撰写
 - `solution-designer`：技术方案 / 业务方案设计
 
+> **WorkBuddy 用户**：agent 创建交给 WorkBuddy 自己做，不要手动放文件。打开 WorkBuddy，把工作目录指到本仓库根，对它说："读 `.ai/agents/prd-writer.md` 和 `solution-designer.md`，按这两份文件创建对应的 agent"。WorkBuddy 会自己处理 agent 的落点、格式和注册（Win/Mac 路径不同，手动放很可能不生效）。
+
 **一键克隆全部技能**：
 
 ```bash
@@ -112,7 +114,7 @@ for s in project-iteration project-intake-pm proto-spec-generator \
 done
 ```
 
-> Claude Code 用户把 `~/.zcode/skills/` 换成 `~/.claude/skills/`；Codex 用户换成 `~/.codex/skills/`。
+> 换工具时只改目标路径：Claude Code 用 `~/.claude/skills/`；Codex 用 `~/.codex/skills/`；WorkBuddy 用 `~/.workbuddy/skills/`。
 
 ## License
 

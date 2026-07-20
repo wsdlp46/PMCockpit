@@ -38,6 +38,10 @@ detect_skill_dirs() {
   if [ -d "$HOME/.claude" ] || command -v claude >/dev/null 2>&1; then
     dirs+=("$HOME/.claude/skills")
   fi
+  # WorkBuddy（CodeBuddy 分身，skill 机制与 ZCode 兼容）
+  if [ -d "$HOME/.workbuddy" ] || [ -d "/Applications/WorkBuddy.app" ]; then
+    dirs+=("$HOME/.workbuddy/skills")
+  fi
   # Codex（无 skill 自动加载，仅供 @ 显式引用）
   if [ -d "$HOME/.codex" ] || command -v codex >/dev/null 2>&1; then
     dirs+=("$HOME/.codex/skills")
@@ -93,6 +97,11 @@ if [ -d "$HOME/.claude" ] || command -v claude >/dev/null 2>&1; then
   # Claude Code 的 agents 一般放项目内 .claude/，这里软链到全局便于跨项目复用
   link_agents_to "$HOME/.claude/agents" 2>/dev/null || true
   echo "✓ Claude Code  → ~/.claude/agents"
+fi
+if [ -d "$HOME/.workbuddy" ] || [ -d "/Applications/WorkBuddy.app" ]; then
+  # WorkBuddy 的 agent 创建由它自己处理（Win/Mac 路径不同，手动放文件可能不生效）
+  echo "⚠ WorkBuddy    → agent 需在 WorkBuddy 内创建：打开 WorkBuddy 指到本仓库根，"
+  echo '                  对它说：读 .ai/agents/prd-writer.md 和 solution-designer.md，按这两份文件创建 agent'
 fi
 echo ""
 

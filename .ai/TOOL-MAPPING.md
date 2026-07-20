@@ -1,6 +1,6 @@
-# TOOL-MAPPING.md — 三工具适配说明
+# TOOL-MAPPING.md — 各工具适配说明
 
-本文件说明本套 PM 工作流资产在 ZCode、Claude Code、Codex 三种 AI 工具下的加载差异，帮你选择工具或排查问题。
+本文件说明本套 PM 工作流资产在 ZCode、Claude Code、WorkBuddy、Codex 等多种 AI 工具下的加载差异，帮你选择工具或排查问题。
 
 ## 资产清单
 
@@ -25,13 +25,14 @@
 
 > 每个 skill 独立升级、互不影响。技能详细介绍见根目录 README.md 的「技能生态」章节。
 
-## 三工具加载机制对比
+## 各工具加载机制对比
 
-| 工具 | 读 AGENTS.md | 自动加载 skills | skills 加载位置 | 本套体系可用度 |
-|------|:---:|:---:|------|------|
-| **ZCode** | 是 | 是 | `~/.zcode/skills` | 完整可用，skill 按关键词自动触发 |
-| **Claude Code** | 是（也读 CLAUDE.md） | 是 | `~/.claude/skills` | 完整可用，体验与 ZCode 等价 |
-| **Codex (OpenAI CLI)** | 是 | 否 | 仅 `~/.codex/`、`AGENTS.md` | 只有 AGENTS.md 规则生效，skill 不自动触发 |
+| 工具 | 读 AGENTS.md | 自动加载 skills | skills 加载位置 | agent 处理 | 本套体系可用度 |
+|------|:---:|:---:|------|------|------|
+| **ZCode** | 是 | 是 | `~/.zcode/skills` | 软链 `.ai/agents/` 到 `~/.zcode/agents/` | 完整可用，skill 按关键词自动触发 |
+| **Claude Code** | 是（也读 CLAUDE.md） | 是 | `~/.claude/skills` | 软链 `.ai/agents/` 到 `~/.claude/agents/` | 完整可用，体验与 ZCode 等价 |
+| **WorkBuddy** | 是 | 是 | `~/.workbuddy/skills` | **交给 WorkBuddy 自己创建**（Win/Mac 路径不同，手动放文件可能不生效） | 完整可用，skill 机制与 ZCode 兼容 |
+| **Codex (OpenAI CLI)** | 是 | 否 | 仅 `~/.codex/`、`AGENTS.md` | 无 agent 机制 | 只有 AGENTS.md 规则生效，skill 不自动触发 |
 
 ## 安装方式
 
@@ -42,7 +43,7 @@ bash .ai/install.sh
 ```
 
 脚本会：
-1. 软链 `.ai/agents/` 到各 AI 工具的全局 agents 目录
+1. 软链 `.ai/agents/` 到 ZCode / Claude Code 的全局 agents 目录（WorkBuddy 跳过，提示用户在 WorkBuddy 内创建）
 2. 检测已安装的 AI 工具，引导你克隆 7 个技能仓库到对应 skills 目录（支持一键全装或按需选装）
 
 ## 各工具注意事项
@@ -55,6 +56,11 @@ bash .ai/install.sh
 ### Claude Code
 - 与 ZCode 体验等价，skill 同样自动触发。
 - skills 目录是 `~/.claude/skills/`，agents 目录是 `~/.claude/agents/`。
+
+### WorkBuddy（CodeBuddy 分身）
+- skill 机制与 ZCode 兼容，skills 目录是 `~/.workbuddy/skills/`，clone 进去即自动触发。
+- **agent 不要手动放文件**：WorkBuddy 是 Electron GUI 应用，Win/Mac 路径不同，且 agent 注册可能涉及内部数据库。正确做法是打开 WorkBuddy，把工作目录指到 PMCockpit 仓库根，对它说："读 `.ai/agents/prd-writer.md` 和 `solution-designer.md`，按这两份文件创建对应的 agent"。WorkBuddy 会自己处理落点和注册。
+- agents 软链步骤 install.sh 会跳过 WorkBuddy 并打印上述提示。
 
 ### Codex（OpenAI CLI）
 - **重要限制**：Codex CLI 没有 skill 自动发现机制，只读 `AGENTS.md` 和 `~/.codex/`。
