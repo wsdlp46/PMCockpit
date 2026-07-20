@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+
+# AI 工具会话文件（本地临时）
+.zcode/
+.claude/
+.codebuddy/
+.workbuddy/
+
+# Node（文档站构建产物，按需）
+node_modules/
+
+# 大二进制文件（Git 不擅长处理，建议走 LFS 或外部存储）
+*.rp
+*.pptx
+*.pdf
+*.docx
+*.xlsx
+
+# 自动生成的图片目录（按项目需要可调整）
+images/
+
+# 临时目录
+_temp/

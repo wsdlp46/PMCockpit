@@ -1,35 +1,53 @@
 #!/usr/bin/env bash
 # ============================================================
 # AI 资产安装脚本
-# 作用：把 .ai/skills 和 .ai/agents 链接到各 AI 工具的全局目录
+# 作用：
+#   1. 把 .ai/agents 链接到各 AI 工具的全局目录
+#   2. 引导用户克隆 7 个独立技能仓库到对应工具的 skills 目录
 # 兼容：ZCode、Claude Code、Codex (OpenAI CLI)
 # 用法：在项目根执行  bash .ai/install.sh
 # ============================================================
 set -e
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SKILLS_SRC="$ROOT/.ai/skills"
 AGENTS_SRC="$ROOT/.ai/agents"
 
-if [ ! -d "$SKILLS_SRC" ]; then
-  echo "✗ 找不到 $SKILLS_SRC，请在项目根目录执行本脚本"
-  exit 1
-fi
+# 7 个独立维护的技能仓库（按需克隆，互不影响）
+SKILL_REPOS=(
+  project-iteration
+  project-intake-pm
+  proto-spec-generator
+  prototype-html-pin
+  tapd-requirement-upload
+  vitepress-deploy
+  project-retrospective-pm
+  prd-writer
+)
+SKILL_GITHUB_USER="wsdlp46"
 
-LINKED=0
-
-link_skills_to() {
-  local target_dir="$1"
-  mkdir -p "$target_dir"
-  for s in "$SKILLS_SRC"/*/; do
-    [ -d "$s" ] || continue
-    local name; name="$(basename "$s")"
-    # 软链，源文件改了全局同步更新；去掉源尾斜杠避免 ln 把链接建进目录内部
-    ln -sfn "${s%/}" "$target_dir/$name"
-    LINKED=$((LINKED + 1))
-  done
+# ------------------------------------------------------------
+# 检测用户安装了哪些 AI 工具，返回 skills 目录列表
+# ------------------------------------------------------------
+detect_skill_dirs() {
+  local dirs=()
+  # ZCode
+  if [ -d "$HOME/.zcode" ] || command -v zcode >/dev/null 2>&1; then
+    dirs+=("$HOME/.zcode/skills")
+  fi
+  # Claude Code
+  if [ -d "$HOME/.claude" ] || command -v claude >/dev/null 2>&1; then
+    dirs+=("$HOME/.claude/skills")
+  fi
+  # Codex（无 skill 自动加载，仅供 @ 显式引用）
+  if [ -d "$HOME/.codex" ] || command -v codex >/dev/null 2>&1; then
+    dirs+=("$HOME/.codex/skills")
+  fi
+  printf '%s\n' "${dirs[@]}"
 }
 
+# ------------------------------------------------------------
+# 把 .ai/agents 软链到目标目录
+# ------------------------------------------------------------
 link_agents_to() {
   local target_dir="$1"
   [ -d "$AGENTS_SRC" ] || return 0
@@ -40,27 +58,80 @@ link_agents_to() {
   done
 }
 
-echo "== 安装 PM 工作流 skills =="
+# ------------------------------------------------------------
+# 克隆/更新技能仓库到目标 skills 目录
+# ------------------------------------------------------------
+clone_skills_to() {
+  local target_dir="$1"
+  mkdir -p "$target_dir"
+  for repo in "${SKILL_REPOS[@]}"; do
+    local dest="$target_dir/$repo"
+    if [ -d "$dest/.git" ]; then
+      echo "  ↻ $repo 已存在，git pull 更新"
+      git -C "$dest" pull --ff-only --quiet 2>/dev/null || echo "    ⚠ 更新失败，跳过（可能网络问题）"
+    elif [ -e "$dest" ]; then
+      echo "  ⚠ $repo 目标位置已存在但不是 git 仓库，跳过：$dest"
+    else
+      echo "  ↓ 克隆 $repo"
+      git clone --quiet "https://github.com/$SKILL_GITHUB_USER/$repo.git" "$dest" \
+        || echo "    ⚠ 克隆失败（仓库可能未公开或不存在），跳过"
+    fi
+  done
+}
 
-# --- ZCode：读 ~/.zcode/skills、~/.zcode/agents ---
+# ============================================================
+# 主流程
+# ============================================================
+echo "== 第一步：安装 agents（随本仓库分发） =="
+AGENTS_LINKED=0
+
 if [ -d "$HOME/.zcode" ] || command -v zcode >/dev/null 2>&1; then
-  link_skills_to "$HOME/.zcode/skills"
   link_agents_to "$HOME/.zcode/agents"
-  echo "✓ ZCode    → ~/.zcode/skills, ~/.zcode/agents"
+  echo "✓ ZCode        → ~/.zcode/agents"
 fi
-
-# --- Claude Code：读 ~/.claude/skills、项目内 .claude/ ---
 if [ -d "$HOME/.claude" ] || command -v claude >/dev/null 2>&1; then
-  link_skills_to "$HOME/.claude/skills"
-  echo "✓ Claude Code → ~/.claude/skills"
+  # Claude Code 的 agents 一般放项目内 .claude/，这里软链到全局便于跨项目复用
+  link_agents_to "$HOME/.claude/agents" 2>/dev/null || true
+  echo "✓ Claude Code  → ~/.claude/agents"
+fi
+echo ""
+
+echo "== 第二步：技能仓库安装 =="
+echo "7 个核心 skill 是独立维护的 GitHub 仓库（github.com/$SKILL_GITHUB_USER/<skill-name>），"
+echo "需要克隆到 AI 工具的 skills 目录才会自动触发。"
+echo ""
+
+# 检测 AI 工具
+SKILL_DIRS=($(detect_skill_dirs))
+if [ ${#SKILL_DIRS[@]} -eq 0 ]; then
+  echo "⚠ 未检测到已安装的 AI 工具（ZCode / Claude Code / Codex）。"
+  echo "  请先安装其一，再重新运行本脚本；或手动克隆技能仓库到对应目录。"
+  echo "  技能清单见 README.md 的「技能生态」章节。"
+  exit 0
 fi
 
-# --- Codex (OpenAI CLI)：无 skill 自动加载机制，只链接到 ~/.codex 供 @ 显式引用 ---
-if [ -d "$HOME/.codex" ] || command -v codex >/dev/null 2>&1; then
-  link_skills_to "$HOME/.codex/skills"
-  echo "⚠ Codex    → ~/.codex/skills（Codex 不自动触发 skill，需手动 @.ai/skills/xxx/SKILL.md 引用，详见 TOOL-MAPPING.md）"
+echo "检测到以下 AI 工具的 skills 目录："
+for d in "${SKILL_DIRS[@]}"; do
+  echo "  - $d"
+done
+echo ""
+
+read -r -p "是否克隆全部技能到以上目录？[Y/n] " ans
+ans="${ans:-Y}"
+if [[ "$ans" =~ ^[Yy]$ ]]; then
+  for d in "${SKILL_DIRS[@]}"; do
+    echo "→ 安装到 $d"
+    clone_skills_to "$d"
+  done
+  echo ""
+  echo "✓ 技能安装完成。"
+else
+  echo "跳过克隆。如需按需安装单个技能，手动执行："
+  echo "  git clone https://github.com/$SKILL_GITHUB_USER/<skill-name>.git <skills 目录>/<skill-name>"
+  echo "  技能清单见 README.md 的「技能生态」章节。"
 fi
 
 echo ""
-echo "== 完成：共链接 $LINKED 个 skill 到各工具目录 =="
-echo "下一步：重启 AI 工具使链接生效。首次使用建议读 AGENTS.md 和 .ai/TOOL-MAPPING.md。"
+echo "== 完成 =="
+echo "下一步：重启 AI 工具使 agents 和 skills 生效。"
+echo "首次使用建议读 AGENTS.md 和 .ai/TOOL-MAPPING.md。"
