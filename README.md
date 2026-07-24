@@ -11,11 +11,11 @@
 - AI 凭"感觉"加按钮、加字段，跟你团队的标准对不上
 - 写完要花大量时间手工校对、改格式、补漏项
 
-PMCockpit 的解法是 **把规范变成 AI 能读的 skills**：不写零散提示词，而是把"PRD 怎么写、原型怎么画、评审查什么"固化成 7 个独立维护、可按关键词自动触发的 skill + 1 份统一的工作区规则（AGENTS.md）。AI 执行时强制遵守，产出稳定可控。
+PMCockpit 的解法是 **把规范变成 AI 能读的 skills**：不写零散提示词，而是把"PRD 怎么写、原型怎么画、评审查什么"固化成 8 个独立维护、可按关键词自动触发的 skill + 1 份统一的工作区规则（AGENTS.md）。AI 执行时强制遵守，产出稳定可控。
 
 ## 核心特色
 
-- **7 个独立 skill 按关键词自动触发**：说"开始新版本"触发建目录骨架；说"画这个页面"触发原型生成；说"上传 TAPD"触发需求拆分。不用手动 @ 任何文件。每个 skill 独立仓库，可单独升级、按需安装。
+- **8 个独立 skill 按关键词自动触发**：说"开始新版本"触发建目录骨架；说"画这个页面"触发原型生成；说"上传 TAPD"触发需求拆分；说"写 PRD"触发需求文档撰写。不用手动 @ 任何文件。每个 skill 独立仓库，可单独升级、按需安装。
 - **AGENTS.md 统一写作纪律**：12 条文档生成纪律（完整性校验、编号一致性、角色带边界、页面编号前缀统一等）全局生效，AI 产出的文档天然规范。
 - **多工具适配**：ZCode、Claude Code、WorkBuddy、Codex 都能用，一条 `install.sh` 自动检测并装到对应工具目录。
 - **结构化规则而非提示词**：设计规范、检查清单、模板都是独立文件，AI 执行 skill 时编程式引用，不是塞进一段超长 prompt。
@@ -34,7 +34,7 @@ bash .ai/install.sh
 #    "开始新版本"
 ```
 
-`install.sh` 会列出 7 个技能仓库地址，你可以一键全部克隆，或按需选装（技能仓库清单见下方"技能生态"章节）。
+`install.sh` 会列出 8 个技能仓库地址，你可以一键全部克隆，或按需选装（技能仓库清单见下方"技能生态"章节）。
 
 AI 会引导你确认版本号、复制上版资产、剥离出干净的目录骨架。然后你就可以开始写需求、画原型了。
 
@@ -52,27 +52,26 @@ clone 后你得到一个完整的工作区骨架，直接在里面建项目：
 
 ```
 我的工作区/                      ← clone PMCockpit 得到
-├── 00主页.md                   ← 工作区仪表盘
 ├── AGENTS.md                   ← 工作区级 AI 指令（写作纪律、硬约束）
 ├── .ai/
 │   ├── install.sh              ← 一键安装，软链 agents 并引导克隆技能仓库
 │   ├── TOOL-MAPPING.md         ← 各工具加载差异说明
 │   └── agents/                 ← 文档撰写专用 agent（prd-writer、solution-designer）
-│                                  注：7 个核心 skill 是独立仓库，不在本仓库内，
+│                                  注：8 个 skill 是独立仓库，不在本仓库内，
 │                                  清单见下方"技能生态"，由 install.sh 引导克隆
-├── 01-通用规则/                ← 方法层（被 skills 自动引用）
+├── 01通用规则/                ← 方法层（被 skills 自动引用）
 │   ├── 方法论/、检查清单/、模板/、设计库/、设计规范/
 │   └── 项目工作流规范.md、助理上手指南.md 等
 ├── 02当前项目/                ← 你的项目放这里（每个项目一个子目录）
 ├── 03知识库/                  ← 知识沉淀（案例库、行业研究、竞品、政策）
 ├── 04历史项目/                ← 已结项归档
-├── 06-对外材料/               ← 方案书、投标文档
+├── 05对外材料/               ← 方案书、投标文档
 └── _附件/                     ← 二进制文件归档（图片、PDF、Excel）
 ```
 
 **建第一个项目**：进入 `02当前项目/`，对 AI 说"开始新版本"，它会在你指定的项目目录下建出完整的迭代结构（00-项目总览、01-项目基线、02-迭代/版本号/）。
 
-> 建项目目录结构的详细规则见 `01-通用规则/项目工作流规范.md` 的四层结构定义。
+> 建项目目录结构的详细规则见 `01通用规则/项目工作流规范.md` 的四层结构定义。
 
 ## 工作流程
 
@@ -85,7 +84,7 @@ clone 后你得到一个完整的工作区骨架，直接在里面建项目：
 
 ## 技能生态
 
-7 个核心 skill 各自独立仓库维护，按需克隆到 AI 工具的 skills 目录（ZCode 是 `~/.zcode/skills/`，Claude Code 是 `~/.claude/skills/`，WorkBuddy 是 `~/.workbuddy/skills/`）。每个 skill 可独立升级，互不影响。
+8 个 skill 各自独立仓库维护，按需克隆到 AI 工具的 skills 目录（ZCode 是 `~/.zcode/skills/`，Claude Code 是 `~/.claude/skills/`，WorkBuddy 是 `~/.workbuddy/skills/`）。每个 skill 可独立升级，互不影响。
 
 | Skill | 仓库 | 触发词 | 职责 |
 |-------|------|--------|------|
@@ -96,10 +95,12 @@ clone 后你得到一个完整的工作区骨架，直接在里面建项目：
 | `tapd-requirement-upload` | [wsdlp46/tapd-requirement-upload](https://github.com/wsdlp46/tapd-requirement-upload) | "上传 TAPD""规划 TAPD" | 从 MVP 需求 + 规格文档生成 TAPD 规划并逐条上传 |
 | `vitepress-deploy` | [wsdlp46/vitepress-deploy](https://github.com/wsdlp46/vitepress-deploy) | "部署文档站""同步到服务器" | VitePress 文档站部署、构建错误修复、内容同步 |
 | `project-retrospective-pm` | [wsdlp46/project-retrospective-pm](https://github.com/wsdlp46/project-retrospective-pm) | "复盘""回顾项目""改进工作流" | 项目复盘：归因、五级联动修复、技能候选评估 |
+| `prd-writer` | [wsdlp46/prd-writer](https://github.com/wsdlp46/prd-writer) | "写 PRD""写需求文档""出需求" | PRD 撰写：判断改造类/新建类场景，驱动交互式需求收集，套模板输出 |
 
-**文档撰写 agent**（在 `.ai/agents/`，随本仓库分发）：
-- `prd-writer`：调用独立的 [wsdlp46/prd-writer](https://github.com/wsdlp46/prd-writer) skill 执行 PRD 撰写
-- `solution-designer`：技术方案 / 业务方案设计
+> prd-writer 同时以两种形态存在：作为 skill 自动触发，也作为 agent（在 `.ai/agents/prd-writer.md`，调用同名的 prd-writer skill）。两个入口都指向同一个独立仓库。
+
+**方案设计 agent**（在 `.ai/agents/`，随本仓库分发）：
+- `solution-designer`：技术方案 / 业务方案设计，调用 `03知识库/工作案例库/` 的历史方案案例
 
 > **WorkBuddy 用户**：agent 创建交给 WorkBuddy 自己做，不要手动放文件。打开 WorkBuddy，把工作目录指到本仓库根，对它说："读 `.ai/agents/prd-writer.md` 和 `solution-designer.md`，按这两份文件创建对应的 agent"。WorkBuddy 会自己处理 agent 的落点、格式和注册（Win/Mac 路径不同，手动放很可能不生效）。
 
@@ -124,4 +125,4 @@ Apache License 2.0。本项目基于 [vagerent/prototype-html](https://github.co
 
 作者：青燃AI说（[GitHub @wsdlp46](https://github.com/wsdlp46)）
 
-欢迎提 issue 反馈使用问题，或贡献新的 skill。参见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+欢迎提 issue 反馈使用问题，或贡献新的 skill。

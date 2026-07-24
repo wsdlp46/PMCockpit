@@ -1,5 +1,7 @@
 # TOOL-MAPPING.md — 各工具适配说明
 
+> _版本：V2.2 ｜ 更新：2026-07-22_
+
 本文件说明本套 PM 工作流资产在 ZCode、Claude Code、WorkBuddy、Codex 等多种 AI 工具下的加载差异，帮你选择工具或排查问题。
 
 ## 资产清单
@@ -7,8 +9,8 @@
 | 类型 | 位置 | 内容 |
 |------|------|------|
 | 入口规则 | 项目根 `AGENTS.md` | 工作流触发、文件结构、写作风格、文档生成纪律、上下文加载顺序 |
-| agents | `.ai/agents/`（随本仓库分发） | prd-writer、solution-designer（文档撰写专用，软链到全局目录） |
-| skills | **独立 GitHub 仓库**，不在本仓库内 | 7 个核心 skill + prd-writer skill，由 install.sh 引导克隆 |
+| agents | `.ai/agents/`（随本仓库分发） | prd-writer（壳，转发到同名 skill）、solution-designer（方案设计专用） |
+| skills | **独立 GitHub 仓库**，不在本仓库内 | 8 个 skill，由 install.sh 引导克隆 |
 
 ### 技能仓库清单（独立维护）
 
@@ -23,7 +25,7 @@
 | project-retrospective-pm | github.com/wsdlp46/project-retrospective-pm |
 | prd-writer | github.com/wsdlp46/prd-writer |
 
-> 每个 skill 独立升级、互不影响。技能详细介绍见根目录 README.md 的「技能生态」章节。
+> 每个 skill 独立升级、互不影响。其中 prd-writer 既作 skill 自动触发，也作 agent 调用（壳在 `.ai/agents/prd-writer.md`，转发到同名 skill）。技能详细介绍见根目录 README.md 的「技能生态」章节。
 
 ## 各工具加载机制对比
 
@@ -44,7 +46,7 @@ bash .ai/install.sh
 
 脚本会：
 1. 软链 `.ai/agents/` 到 ZCode / Claude Code 的全局 agents 目录（WorkBuddy 跳过，提示用户在 WorkBuddy 内创建）
-2. 检测已安装的 AI 工具，引导你克隆 7 个技能仓库到对应 skills 目录（支持一键全装或按需选装）
+2. 检测已安装的 AI 工具，引导你克隆 8 个技能仓库到对应 skills 目录（支持一键全装或按需选装）
 
 ## 各工具注意事项
 
