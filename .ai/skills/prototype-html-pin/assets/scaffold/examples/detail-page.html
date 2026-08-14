@@ -1,0 +1,563 @@
+<!-- ⚠️ 构建产物，请勿手改，改动会在下次 build 时丢失。 -->
+<!-- 编辑源文件 A30-数据资源详情页.src.html，然后运行 _scaffold-admin/build.sh 重新生成。 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A30 数据资源详情页 — 数据空间平台管理端</title>
+<script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ==========================================================================
+   proto-base.css — 数据空间工作台原型公共基线
+   由 W0-工作台仪表盘.html 抽取，所有 W*.html 共用。
+   含：:root 变量、body、滚动条、布局骨架、侧边栏、文档面板、连线层、响应式。
+   不含：各页特有的内容样式（卡片/表格/标签细节等保留在各页内联样式块）。
+   ========================================================================== */
+
+:root {
+  --brand: #1E63B2;
+  --brand-hover: #164B8A;
+  --brand-bg: rgba(30,99,178,0.06);
+  --brand-border: rgba(30,99,178,0.15);
+  --slate-50: #F8FAFC;
+  --slate-100: #F1F5F9;
+  --slate-200: #E2E8F0;
+  --slate-300: #CBD5E1;
+  --slate-400: #94A3B8;
+  --slate-500: #64748B;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1E293B;
+  --success: #52C41A;
+  --warning: #FAAD14;
+  --error: #F5222D;
+  --info: #1890FF;
+  --amber-bg: #FFFBEB;
+  --amber-border: #fde68a;
+  --amber-accent: #D97706;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #F5F5F5;
+  overflow: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #F5F7FA; }
+::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+/* Layout 骨架 */
+.app-container { display: flex; height: 100vh; position: relative; }
+.main-content { width: 78%; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+.doc-panel {
+  width: 22%; height: 100vh; background: var(--amber-bg);
+  border-left: 2px solid var(--amber-border); padding: 24px 20px;
+  overflow-y: auto; position: relative;
+}
+
+/* Top bar（顶栏，多数后台页共用） */
+.topbar { height: 48px; background: #fff; border-bottom: 1px solid var(--slate-200); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-shrink: 0; }
+.topbar-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--slate-500); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.topbar-right .org-name { font-size: 13px; color: var(--slate-600); cursor: pointer; }
+.topbar-right .notify-bell { position: relative; cursor: pointer; color: var(--slate-500); font-size: 17px; }
+.notify-bell .badge { position: absolute; top: -5px; right: -8px; background: var(--error); color: #fff; font-size: 10px; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+.topbar-right .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* Content area */
+.content-area { flex: 1; overflow-y: auto; padding: 24px; background: #F5F5F5; }
+.page-title { font-size: 20px; font-weight: 700; color: var(--slate-800); margin-bottom: 4px; }
+.page-subtitle { font-size: 13px; color: var(--slate-500); margin-bottom: 24px; }
+
+/* Cards / 通用卡片 */
+.card { background: #fff; border-radius: 8px; border: 1px solid var(--slate-200); }
+
+/* Section header */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.section-title { font-size: 16px; font-weight: 600; color: var(--slate-800); }
+.section-link { font-size: 13px; color: var(--brand); cursor: pointer; }
+.section-link:hover { text-decoration: underline; }
+.badge-count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 600; margin-left: 8px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--slate-200); margin-bottom: 0; }
+.tab-item { padding: 8px 16px; font-size: 13px; color: var(--slate-500); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; }
+.tab-item:hover { color: var(--brand); }
+.tab-item.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+
+/* Tags（状态标签，后台页通用） */
+.tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+.tag-orange { background: rgba(250,173,20,0.12); color: #D48806; }
+.tag-blue { background: rgba(30,99,178,0.1); color: var(--brand); }
+.tag-purple { background: rgba(114,46,209,0.1); color: #722ED1; }
+.tag-green { background: rgba(82,196,26,0.12); color: #389E0D; }
+.tag-red { background: rgba(245,34,45,0.1); color: #CF1322; }
+.tag-gray { background: #F5F5F5; color: var(--slate-500); }
+
+/* Table（后台列表通用） */
+.table-wrap { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table thead th { background: #F6F6F6; padding: 10px 16px; text-align: left; font-weight: 600; color: var(--slate-600); font-size: 12px; border-bottom: 1px solid var(--slate-200); white-space: nowrap; }
+.data-table tbody td { padding: 10px 16px; border-bottom: 1px solid var(--slate-100); color: var(--slate-700); }
+.data-table tbody tr { transition: background 0.15s; }
+.data-table tbody tr:nth-child(even) { background: #FBFBFC; }
+.data-table tbody tr:hover { background: rgba(30,99,178,0.04); }
+.data-table .action-link { color: var(--brand); cursor: pointer; font-weight: 500; font-size: 13px; }
+.data-table .action-link:hover { text-decoration: underline; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--slate-400); font-size: 13px; }
+.empty-state i { font-size: 32px; margin-bottom: 8px; display: block; }
+
+/* Two-column */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+/* Proto element highlight（标注高亮） */
+.proto-element { position: relative; transition: all 0.2s ease; border-radius: 8px; }
+.proto-element:hover, .proto-element.active-highlight {
+  box-shadow: 0 0 0 2px var(--brand), 0 4px 12px rgba(30,99,178,0.15);
+  background-color: rgba(30,99,178,0.03);
+}
+.proto-desc { transition: all 0.2s ease; border-radius: 8px; border: 1px solid var(--amber-border); background: #fff; }
+.proto-desc:hover, .proto-desc.active-highlight {
+  background: #fef3c7; border-color: var(--amber-accent);
+  box-shadow: 0 2px 8px rgba(217,119,6,0.15);
+}
+
+/* SVG connections（连线层） */
+#connections-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+.connection-path { fill: none; stroke: var(--brand); stroke-width: 2; opacity: 0.5; transition: all 0.25s ease; }
+.connection-path.active { stroke-width: 3; opacity: 1; }
+.conn-label-bg { fill: var(--brand); }
+.conn-label-text { fill: #fff; font-size: 11px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+
+/* Doc panel 文档面板 */
+.doc-panel h2 { font-size: 17px; font-weight: 700; color: var(--slate-800); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--amber-border); }
+.doc-section { margin-bottom: 20px; padding: 12px 14px; background: #fff; border-radius: 8px; border: 1px solid var(--amber-border); font-size: 13px; line-height: 1.7; color: var(--slate-600); position: relative; transition: all 0.2s; }
+.doc-section .doc-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--brand); color: #fff; font-size: 11px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+.doc-section .doc-label { font-weight: 600; color: var(--slate-700); font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; }
+.doc-section .doc-desc { font-size: 12px; color: var(--slate-500); }
+
+/* ===== Standard Sidebar（标准侧边栏） ===== */
+.sidebar { width: 220px; min-width: 220px; background: #fff; border-right: 1px solid var(--slate-200); display: flex; flex-direction: column; position: relative; transition: width 0.3s, min-width 0.3s; flex-shrink: 0; }
+.sidebar.collapsed { width: 56px; min-width: 56px; }
+.sidebar.collapsed .nav-text, .sidebar.collapsed .nav-group-title, .sidebar.collapsed .org-info-text, .sidebar.collapsed .logo-text { display: none; }
+.sidebar-logo { height: 56px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--slate-200); cursor: pointer; gap: 10px; flex-shrink: 0; }
+.sidebar-logo .logo-icon { width: 32px; height: 32px; background: var(--brand); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; flex-shrink: 0; }
+.sidebar-logo .logo-text { font-size: 14px; font-weight: 700; color: var(--slate-800); white-space: nowrap; }
+.sidebar-nav { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 0; }
+.sidebar-nav::-webkit-scrollbar { width: 4px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: var(--slate-300); border-radius: 2px; }
+.nav-group { margin-bottom: 2px; }
+.nav-group-title { padding: 12px 16px 4px; font-size: 11px; font-weight: 600; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+.nav-item { padding: 9px 16px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--slate-600); cursor: pointer; transition: all 0.15s; border-right: 3px solid transparent; white-space: nowrap; }
+.nav-item:hover { background: rgba(30,99,178,0.06); color: var(--brand); }
+.nav-item.active { background: rgba(30,99,178,0.1); color: var(--brand); border-right-color: var(--brand); font-weight: 600; }
+.nav-item i { width: 18px; text-align: center; font-size: 14px; flex-shrink: 0; }
+.sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--slate-200); font-size: 12px; color: var(--slate-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+.sidebar-footer i { margin-right: 6px; color: var(--slate-400); }
+.collapse-toggle { position: absolute; bottom: 56px; right: -12px; width: 24px; height: 24px; background: #fff; border: 1px solid var(--slate-200); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; color: var(--slate-500); z-index: 20; transition: all 0.15s; }
+.collapse-toggle:hover { background: rgba(30,99,178,0.06); color: var(--brand); border-color: var(--brand); }
+.collapse-toggle i { transition: transform 0.3s; }
+
+/* ===== 详情页卡片堆叠布局（对齐 W 系列）===== */
+/* status bar 详情状态条 */
+.status-bar { background: #fff; border: 1px solid var(--slate-200); border-radius: 8px; padding: 18px 24px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.status-bar .sb-left { display: flex; align-items: center; gap: 16px; }
+.status-bar .sb-title { font-size: 18px; font-weight: 600; color: var(--slate-800); }
+.status-bar .sb-meta { display: flex; gap: 16px; font-size: 12px; color: var(--slate-400); align-items: center; }
+.mono { font-family: "SF Mono", Menlo, monospace; font-size: 12px; color: var(--slate-500); }
+/* overview card 概览卡（空间详情用） */
+.overview-card { background: #fff; border: 1px solid var(--slate-200); border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+.ov-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.ov-title { font-size: 20px; font-weight: 600; color: var(--slate-800); display: flex; align-items: center; gap: 10px; }
+.ov-tags { display: flex; gap: 6px; margin-top: 8px; }
+.ov-desc { font-size: 13px; color: var(--slate-500); line-height: 1.7; margin-bottom: 14px; }
+.ov-meta { display: flex; flex-wrap: wrap; gap: 20px; font-size: 12px; color: var(--slate-400); }
+.ov-meta span i { margin-right: 4px; color: var(--slate-300); }
+/* metrics 指标行 */
+.metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+.m-card { background: #fff; border: 1px solid var(--slate-200); border-radius: 8px; padding: 16px 18px; display: flex; align-items: center; gap: 12px; }
+.m-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.m-icon.blue { background: rgba(30,99,178,0.1); color: var(--brand); }
+.m-icon.green { background: rgba(82,196,26,0.1); color: var(--success); }
+.m-icon.purple { background: rgba(114,46,209,0.1); color: var(--purple); }
+.m-icon.orange { background: rgba(250,173,20,0.1); color: var(--warning); }
+.m-info .m-num { font-size: 22px; font-weight: 700; color: var(--slate-800); line-height: 1.1; }
+.m-info .m-label { font-size: 12px; color: var(--slate-400); }
+/* card 内容卡片 */
+.card { background: #fff; border: 1px solid var(--slate-200); border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--slate-800); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--slate-100); display: flex; align-items: center; gap: 8px; }
+.card-title i { color: var(--brand); font-size: 13px; }
+/* info grid 字段网格 */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 32px; }
+.info-item { display: flex; flex-direction: column; gap: 3px; }
+.info-item.full { grid-column: 1 / -1; }
+.info-label { font-size: 11px; color: var(--slate-400); }
+.info-value { font-size: 13px; color: var(--slate-700); }
+.info-value.link { color: var(--brand); cursor: pointer; }
+.info-value.link:hover { text-decoration: underline; }
+/* confirm grid 双方签订状态 */
+.confirm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.confirm-card { border: 1px solid var(--slate-200); border-radius: 8px; padding: 16px; }
+.confirm-card.me { border-color: var(--brand); background: var(--brand-bg); }
+.confirm-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.confirm-role { font-size: 13px; font-weight: 600; color: var(--slate-700); }
+.confirm-card.me .confirm-role { color: var(--brand); }
+.confirm-status { font-size: 12px; }
+.confirm-status.done { color: var(--success); }
+.confirm-status.wait { color: var(--slate-400); }
+.confirm-org { font-size: 13px; color: var(--slate-600); margin-bottom: 6px; }
+.confirm-time { font-size: 11px; color: var(--slate-400); }
+/* progress 执行进度 */
+.progress-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+.progress-bar { flex: 1; height: 10px; background: var(--slate-100); border-radius: 5px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--success), #73D13D); border-radius: 5px; }
+.progress-num { font-size: 16px; font-weight: 700; color: var(--success); }
+.progress-stages { display: flex; justify-content: space-between; font-size: 11px; color: var(--slate-400); position: relative; margin-top: 4px; }
+.progress-stages .stage.done { color: var(--success); }
+/* log 执行日志 */
+.log-box { background: var(--slate-800); border-radius: 6px; padding: 14px 16px; max-height: 240px; overflow-y: auto; font-family: "SF Mono", Menlo, monospace; font-size: 12px; line-height: 1.9; }
+.log-line { display: flex; gap: 12px; }
+.log-time { color: var(--slate-400); flex-shrink: 0; }
+.log-level { flex-shrink: 0; width: 36px; font-weight: 600; }
+.log-level.info { color: #60A5FA; }
+.log-level.warn { color: var(--warning); }
+.log-level.error { color: var(--error); }
+.log-msg { color: var(--slate-300); }
+/* result table 交付结果 */
+.result-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.result-table th { background: var(--slate-50); color: var(--slate-500); font-weight: 600; text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--slate-200); }
+.result-table td { padding: 10px 12px; border-bottom: 1px solid var(--slate-100); color: var(--slate-700); }
+.result-table tr:nth-child(even) td { background: var(--slate-50); }
+.result-file { display: flex; align-items: center; gap: 8px; }
+.result-file i { color: var(--brand); }
+/* evidence 存证 */
+.evidence-box { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(114,46,209,0.06); border: 1px solid rgba(114,46,209,0.2); border-radius: 6px; }
+.evidence-box .ev-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(114,46,209,0.1); color: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.evidence-box .ev-info { flex: 1; }
+.evidence-box .ev-title { font-size: 13px; color: var(--slate-700); font-weight: 500; }
+.evidence-box .ev-hash { font-size: 11px; color: var(--slate-400); font-family: "SF Mono", Menlo, monospace; margin-top: 2px; }
+/* sticky actions 底部固定操作区 */
+.sticky-actions { position: sticky; bottom: 0; background: var(--slate-50); padding: 14px 0 4px; display: flex; gap: 10px; border-top: 1px solid var(--slate-200); margin-top: 8px; }
+/* data-table 详情内表格（A 端补充，与 W 对齐） */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th { background: var(--slate-50); color: var(--slate-500); font-weight: 600; text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--slate-200); white-space: nowrap; }
+.data-table td { padding: 10px 12px; border-bottom: 1px solid var(--slate-100); color: var(--slate-700); }
+.data-table tr:nth-child(even) td { background: var(--slate-50); }
+.data-table tr:hover td { background: #EBF3FC; }
+.data-table .action-link { color: var(--brand); cursor: pointer; margin-right: 8px; font-size: 12px; }
+.data-table .action-link:hover { text-decoration: underline; }
+/* 操作日志时间线（详情页通用） */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ""; position: absolute; left: 7px; top: 4px; bottom: 4px; width: 2px; background: var(--slate-200); }
+.timeline .tl-item { position: relative; padding-bottom: 14px; }
+.timeline .tl-item:last-child { padding-bottom: 0; }
+.timeline .tl-dot { width: 12px; height: 12px; border-radius: 50%; position: absolute; left: -22px; top: 2px; }
+.timeline .tl-head { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.timeline .tl-name { font-size: 13px; color: var(--slate-700); font-weight: 500; }
+.timeline .tl-time { font-size: 12px; color: var(--slate-400); }
+.timeline .tl-desc { font-size: 12px; color: var(--slate-500); }
+
+/* Mobile 响应式（布局骨架部分，内容样式各页自行覆盖） */
+@media (max-width: 768px) {
+  .app-container { flex-direction: column; }
+  .main-content { width: 100%; height: 60vh; }
+  .doc-panel { width: 100%; height: 40vh; border-left: none; border-top: 2px solid var(--amber-border); }
+  #connections-svg { display: none; }
+  .sidebar { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="app-container" id="appContainer">
+  <div class="main-content"><div style="display:flex;flex:1;overflow:hidden;">
+    <aside class="sidebar" id="stdSidebar">
+  <div class="sidebar-logo" onclick="location.href='A1-运营大屏页.html'">
+    <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+    <span class="logo-text">数据空间平台</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item" data-href="A1-运营大屏页.html">
+      <i class="fas fa-chart-line"></i><span class="nav-text">运营大屏</span>
+    </div>
+
+    <div class="nav-group-title">接入管理</div>
+    <div class="nav-item" data-href="A2-机构列表页.html">
+      <i class="fas fa-building"></i><span class="nav-text">机构管理</span>
+    </div>
+    <div class="nav-item" data-href="A29-用户管理列表页.html">
+      <i class="fas fa-user-cog"></i><span class="nav-text">用户管理</span>
+    </div>
+    <div class="nav-item" data-href="A14-连接器管理列表页.html">
+      <i class="fas fa-plug"></i><span class="nav-text">连接器管理</span>
+    </div>
+
+    <div class="nav-group-title">数据治理</div>
+    <div class="nav-item" data-href="A7-目录管理列表页.html">
+      <i class="fas fa-folder-tree"></i><span class="nav-text">数据目录管理</span>
+    </div>
+    <div class="nav-item" data-href="A10-空间管理列表页.html">
+      <i class="fas fa-object-group"></i><span class="nav-text">数据空间管理</span>
+    </div>
+
+    <div class="nav-group-title">流通管控</div>
+    <div class="nav-item" data-href="A17-合约管理列表页.html">
+      <i class="fas fa-file-contract"></i><span class="nav-text">合约管理</span>
+    </div>
+    <div class="nav-item" data-href="A19-任务监控列表页.html">
+      <i class="fas fa-list-check"></i><span class="nav-text">交付任务监控</span>
+    </div>
+
+    <div class="nav-group-title">门户运营</div>
+    <div class="nav-item" data-href="A5-资讯管理页.html">
+      <i class="fas fa-newspaper"></i><span class="nav-text">资讯管理</span>
+    </div>
+    <div class="nav-item" data-href="A6-分类配置页.html">
+      <i class="fas fa-tags"></i><span class="nav-text">分类配置</span>
+    </div>
+
+    <div class="nav-group-title">审批中心</div>
+    <div class="nav-item" data-href="A21-审批工作台页.html">
+      <i class="fas fa-clipboard-list"></i><span class="nav-text">审批工作台</span>
+    </div>
+    <div class="nav-item" data-href="A22-审批历史页.html">
+      <i class="fas fa-history"></i><span class="nav-text">审批历史</span>
+    </div>
+
+    <div class="nav-group-title">运营分析</div>
+    <div class="nav-item" data-href="A23-报表看板页.html">
+      <i class="fas fa-chart-pie"></i><span class="nav-text">报表看板</span>
+    </div>
+    <div class="nav-item" data-href="A24-机构增长分析页.html">
+      <i class="fas fa-chart-line"></i><span class="nav-text">机构增长分析</span>
+    </div>
+    <div class="nav-item" data-href="A25-空间活跃分析页.html">
+      <i class="fas fa-chart-area"></i><span class="nav-text">空间活跃分析</span>
+    </div>
+    <div class="nav-item" data-href="A26-数据流通分析页.html">
+      <i class="fas fa-exchange-alt"></i><span class="nav-text">数据流通分析</span>
+    </div>
+
+    <div class="nav-group-title">审计存证</div>
+    <div class="nav-item" data-href="A27-存证检索页.html">
+      <i class="fas fa-shield-halved"></i><span class="nav-text">存证检索</span>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <i class="fas fa-user-shield"></i><span class="org-info-text">平台运营方 · 管理端</span>
+  </div>
+  <div class="collapse-toggle" onclick="toggleStdSidebar(this)">
+    <i class="fas fa-chevron-left"></i>
+  </div>
+</aside>
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+      <header class="topbar"><div class="topbar-left"><i class="fas fa-home" style="color:var(--slate-400);"></i><span>首页</span><i class="fas fa-chevron-right" style="font-size:9px;color:var(--slate-300);"></i><span>数据治理</span><i class="fas fa-chevron-right" style="font-size:9px;color:var(--slate-300);"></i><span>数据目录管理</span><i class="fas fa-chevron-right" style="font-size:9px;color:var(--slate-300);"></i><span style="color:var(--slate-700);">数据资源详情</span></div><div class="topbar-right"><div class="notify-bell"><i class="fas fa-bell"></i><span class="badge">3</span></div><span class="org-name">平台运营管理员<i class="fas fa-caret-down" style="font-size:10px;margin-left:2px;"></i></span><div class="user-avatar">运</div></div></header>
+      <div class="content-area">
+        <div style="margin-bottom:12px;"><a href="A7-目录管理列表页.html" style="color:var(--brand);font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;cursor:pointer;"><i class="fas fa-arrow-left"></i> 返回列表</a></div>
+        <div class="page-title">数据资源详情</div>
+
+        <!-- 状态条 -->
+        <div class="proto-element status-bar" data-proto-id="1">
+          <div class="sb-left"><div class="sb-title">环境监测站点空气质量数据集</div><span class="tag tag-green">已上架</span></div>
+          <div class="sb-meta"><span>资源标识：<span class="mono">res:env:8f3ac91e</span></span><span>提供方：XX环境科学研究院</span></div>
+        </div>
+
+        <!-- 卡片1：基本信息 -->
+        <div class="proto-element card" data-proto-id="2">
+          <div class="card-title"><i class="fas fa-circle-info"></i> 基本信息</div>
+          <div class="info-grid">
+            <div class="info-item full"><div class="info-label">资源名称</div><div class="info-value">环境监测站点空气质量数据集</div></div>
+            <div class="info-item"><div class="info-label">资源标识</div><div class="info-value mono">res:env:8f3ac91e</div></div>
+            <div class="info-item"><div class="info-label">来源数据源</div><div class="info-value">XX环境监测数据库</div></div>
+            <div class="info-item"><div class="info-label">提供方</div><div class="info-value link" onclick="navigateTo('A3-机构详情页.html')">XX环境科学研究院</div></div>
+            <div class="info-item"><div class="info-label">所属空间</div><div class="info-value">XX环境数据协作空间</div></div>
+            <div class="info-item"><div class="info-label">行业分类</div><div class="info-value">N 水利、环境和公共设施管理业</div></div>
+            <div class="info-item"><div class="info-label">资源格式</div><div class="info-value">电子表格</div></div>
+            <div class="info-item"><div class="info-label">数据来源</div><div class="info-value">原始取得</div></div>
+            <div class="info-item"><div class="info-label">是否涉及个人信息</div><div class="info-value"><span class="tag tag-orange">是</span></div></div>
+            <div class="info-item"><div class="info-label">联系人</div><div class="info-value">张管理</div></div>
+            <div class="info-item"><div class="info-label">联系方式</div><div class="info-value">0591-87861234</div></div>
+            <div class="info-item"><div class="info-label">创建时间</div><div class="info-value">2026-03-12 14:20</div></div>
+            <div class="info-item"><div class="info-label">最近更新</div><div class="info-value">2026-06-20 09:30</div></div>
+            <div class="info-item full"><div class="info-label">资源摘要</div><div class="info-value">各地市环境监测站点实时空气质量数据</div></div>
+          </div>
+        </div>
+
+        <!-- 卡片2：信息项 -->
+        <div class="card">
+          <div class="card-title"><i class="fas fa-list-ul"></i> 信息项 <span style="font-size:12px;font-weight:400;color:var(--slate-400)">共 12 项</span></div>
+          <table class="data-table">
+            <thead><tr><th style="width:60px;">序号</th><th>信息项名称</th><th>数据类型</th><th style="width:80px;">是否敏感</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>监测站点编号</td><td>字符串</td><td>否</td></tr>
+              <tr><td>2</td><td>监测时间</td><td>日期时间</td><td>否</td></tr>
+              <tr><td>3</td><td>PM2.5浓度</td><td>数值</td><td>否</td></tr>
+              <tr><td>4</td><td>PM10浓度</td><td>数值</td><td>否</td></tr>
+              <tr><td>5</td><td>二氧化硫浓度</td><td>数值</td><td>否</td></tr>
+              <tr><td>6</td><td>站点负责人</td><td>字符串</td><td><span class="tag tag-orange">是</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 卡片3：关联产品 -->
+        <div class="card">
+          <div class="card-title"><i class="fas fa-link"></i> 关联产品 <span style="font-size:12px;font-weight:400;color:var(--slate-400)">共 3 个</span></div>
+          <table class="data-table">
+            <thead><tr><th>产品名称</th><th>产品类型</th><th>提供方</th><th>发布状态</th><th>更新时间</th></tr></thead>
+            <tbody>
+              <tr><td><span class="action-link" onclick="navigateTo('A31-数据产品详情页.html')">空气质量数据API</span></td><td><span class="tag tag-purple">API产品</span></td><td>XX环境科学研究院</td><td><span class="tag tag-green">已上架</span></td><td>2026-04-01</td></tr>
+              <tr><td><span class="action-link" onclick="navigateTo('A31-数据产品详情页.html')">环境数据看板</span></td><td><span class="tag tag-blue">数据应用</span></td><td>XX环境科学研究院</td><td><span class="tag tag-green">已上架</span></td><td>2026-05-15</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 卡片4：操作日志 -->
+        <div class="card">
+          <div class="card-title"><i class="fas fa-clock-rotate-left"></i> 操作日志 <span style="font-size:12px;font-weight:400;color:var(--slate-400)">标注操作来源</span></div>
+          <div class="timeline">
+            <div class="tl-item"><span class="tl-dot" style="background:var(--brand)"></span><div class="tl-head"><span class="tl-name">创建资源</span><span class="tag tag-gray" style="font-size:10px">参与方·提供方</span><span class="tl-time">2026-03-12 14:00</span></div><div class="tl-desc">XX环境科学研究院 创建数据资源并抽取信息项</div></div>
+            <div class="tl-item"><span class="tl-dot" style="background:var(--success)"></span><div class="tl-head"><span class="tl-name">上架申请</span><span class="tag tag-gray" style="font-size:10px">参与方·提供方</span><span class="tl-time">2026-03-12 14:05</span></div><div class="tl-desc">提交上架审核申请</div></div>
+            <div class="tl-item"><span class="tl-dot" style="background:var(--success)"></span><div class="tl-head"><span class="tl-name">审核通过上架</span><span class="tag tag-gray" style="font-size:10px">参与方·提供方</span><span class="tl-time">2026-03-12 14:20</span></div><div class="tl-desc">平台审核通过，资源上架至目录</div></div>
+          </div>
+        </div>
+
+        <div class="sticky-actions">
+          <button class="btn btn-cancel btn-lg" onclick="navigateTo('A7-目录管理列表页.html')"><i class="fas fa-arrow-left"></i> 返回列表</button>
+        </div>
+      </div>
+    </div>
+  </div></div>
+  <div style="width:1px;background:var(--amber-border);flex-shrink:0;"></div>
+  <div class="doc-panel" id="rightPanel"><div style="margin-bottom:14px;padding:10px 12px;background:var(--amber-border);border-radius:6px;display:flex;align-items:center;gap:8px;"><span style="background:var(--amber-accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;">PROTOTYPE</span><span style="font-size:12px;font-weight:600;color:var(--amber-accent);">A30 数据资源详情页</span></div><h2>功能说明</h2><div class="proto-desc doc-section" data-proto-desc="1"><div class="doc-label"><span class="doc-num">1</span> 状态条</div><div class="doc-desc">资源名称、发布状态、资源标识、提供方。对齐 W8 数据资源。</div></div><div class="proto-desc doc-section" data-proto-desc="2"><div class="doc-label"><span class="doc-num">2</span> 卡片堆叠</div><div class="doc-desc">弃用页签，改卡片堆叠：①基本信息（14字段含个人信息标识，符合 NDI-TR-2025-06）②信息项（名称/类型/是否敏感）③关联产品（跳A31）④操作日志（含操作来源标签）。字段口径与 W8 统一。</div></div></div>
+  <svg id="connections-svg"></svg>
+</div>
+<script>
+/* ==========================================================================
+   proto-connect.js — 数据空间工作台原型公共脚本
+   含：当前页自动高亮(active)、连线系统、标注联动、侧边栏折叠。
+   所有 W*.html 共用。页面特有交互（如 tab 切换）留在各页内联 <script>。
+   ========================================================================== */
+
+// ==================== 当前页自动标记 active ====================
+// 根据 location.pathname 的文件名，自动给侧边栏对应项加 active 类。
+// 这样 28 个页面共用一份侧边栏 HTML，无需逐页维护 active。
+function markActiveSidebar() {
+  var current = location.pathname.split('/').pop() || 'W0-工作台仪表盘.html';
+  document.querySelectorAll('#stdSidebar .nav-item[data-href]').forEach(function(item) {
+    var href = item.getAttribute('data-href');
+    // 点击跳转
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', function() { location.href = href; });
+    // 标记 active
+    if (href === current) item.classList.add('active');
+  });
+}
+
+// ==================== 连线系统 ====================
+// 页面需声明 window.connections 数组：{ id, selector, descSelector }
+function drawConnections() {
+  var svg = document.getElementById('connections-svg');
+  if (!svg) return;
+  var conns = window.connections || [];
+  if (!conns.length) { svg.innerHTML = ''; return; }
+  var container = document.getElementById('appContainer');
+  if (!container) return;
+  var containerRect = container.getBoundingClientRect();
+  svg.setAttribute('viewBox', '0 0 ' + containerRect.width + ' ' + containerRect.height);
+  svg.style.width = containerRect.width + 'px';
+  svg.style.height = containerRect.height + 'px';
+  var html = '';
+  conns.forEach(function(c) {
+    var leftEl = document.querySelector(c.selector);
+    var rightEl = document.querySelector(c.descSelector);
+    if (!leftEl || !rightEl) return;
+    var lr = leftEl.getBoundingClientRect();
+    var rr = rightEl.getBoundingClientRect();
+    var x1 = lr.right - containerRect.left;
+    var y1 = lr.top + lr.height / 2 - containerRect.top;
+    var x2 = rr.left - containerRect.left;
+    var y2 = rr.top + rr.height / 2 - containerRect.top;
+    var cx1 = x1 + (x2 - x1) * 0.4;
+    var cx2 = x1 + (x2 - x1) * 0.6;
+    var d = 'M ' + x1 + ' ' + y1 + ' C ' + cx1 + ' ' + y1 + ', ' + cx2 + ' ' + y2 + ', ' + x2 + ' ' + y2;
+    html += '<path class="connection-path" id="conn-path-' + c.id + '" d="' + d + '" data-conn="' + c.id + '"/>';
+    var mx = x1 + (x2 - x1) * 0.5;
+    var my = y1 + (y2 - y1) * 0.5;
+    html += '<circle cx="' + mx + '" cy="' + my + '" r="9" class="conn-label-bg"/>';
+    html += '<text x="' + mx + '" y="' + my + '" class="conn-label-text">' + c.id + '</text>';
+  });
+  svg.innerHTML = html;
+}
+
+// ==================== 标注联动高亮 ====================
+function setupConnHover() {
+  document.querySelectorAll('.proto-element').forEach(function(el) {
+    el.addEventListener('mouseenter', function() {
+      var pid = el.getAttribute('data-proto-id');
+      if (!pid) return;
+      var path = document.getElementById('conn-path-' + pid);
+      if (path) path.classList.add('active');
+      var desc = document.querySelector('[data-proto-desc="' + pid + '"]');
+      if (desc) desc.classList.add('active-highlight');
+    });
+    el.addEventListener('mouseleave', function() {
+      var pid = el.getAttribute('data-proto-id');
+      if (!pid) return;
+      var path = document.getElementById('conn-path-' + pid);
+      if (path) path.classList.remove('active');
+      var desc = document.querySelector('[data-proto-desc="' + pid + '"]');
+      if (desc) desc.classList.remove('active-highlight');
+    });
+  });
+  document.querySelectorAll('.proto-desc').forEach(function(el) {
+    el.addEventListener('mouseenter', function() {
+      var pid = el.getAttribute('data-proto-desc');
+      if (!pid) return;
+      var path = document.getElementById('conn-path-' + pid);
+      if (path) path.classList.add('active');
+      var proto = document.querySelector('[data-proto-id="' + pid + '"]');
+      if (proto) proto.classList.add('active-highlight');
+    });
+    el.addEventListener('mouseleave', function() {
+      var pid = el.getAttribute('data-proto-desc');
+      if (!pid) return;
+      var path = document.getElementById('conn-path-' + pid);
+      if (path) path.classList.remove('active');
+      var proto = document.querySelector('[data-proto-id="' + pid + '"]');
+      if (proto) proto.classList.remove('active-highlight');
+    });
+  });
+}
+
+// ==================== 侧边栏折叠 ====================
+function toggleStdSidebar(toggleEl) {
+  var sidebar = document.getElementById('stdSidebar');
+  if (!sidebar) return;
+  sidebar.classList.toggle('collapsed');
+  var icon = toggleEl.querySelector('i');
+  if (icon) {
+    icon.className = sidebar.classList.contains('collapsed') ? 'fas fa-chevron-right' : 'fas fa-chevron-left';
+  }
+  setTimeout(drawConnections, 350);
+}
+
+// ==================== 初始化 ====================
+window.addEventListener('DOMContentLoaded', function() {
+  markActiveSidebar();
+  drawConnections();
+  setupConnHover();
+});
+window.addEventListener('resize', drawConnections);
+
+</script>
+<script>
+window.connections=[{id:1,selector:'[data-proto-id="1"]',descSelector:'[data-proto-desc="1"]'},{id:2,selector:'[data-proto-id="2"]',descSelector:'[data-proto-desc="2"]'}];
+function navigateTo(url){if(url==='#')return;location.href=url;}
+</script>
+</body>
+</html>

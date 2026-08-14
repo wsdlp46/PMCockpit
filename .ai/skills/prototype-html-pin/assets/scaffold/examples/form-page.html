@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W6 新增接入页 — 数据空间平台</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root {
+    --brand: #1E63B2; --brand-hover: #164B8A; --brand-bg: rgba(30,99,178,0.06); --brand-border: rgba(30,99,178,0.15);
+    --slate-50: #F8FAFC; --slate-100: #F1F5F9; --slate-200: #E2E8F0; --slate-300: #CBD5E1;
+    --slate-400: #94A3B8; --slate-500: #64748B; --slate-600: #475569; --slate-700: #334155; --slate-800: #1E293B;
+    --success: #52C41A; --warning: #FAAD14; --error: #F5222D; --info: #1890FF;
+    --amber-bg: #FFFBEB; --amber-border: #fde68a; --amber-accent: #D97706;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#F5F5F5;overflow:hidden}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:#F5F7FA}
+  ::-webkit-scrollbar-thumb{background:#c1c1c1;border-radius:3px}
+  ::-webkit-scrollbar-thumb:hover{background:#a8a8a8}
+
+  .app-container{display:flex;height:100vh;position:relative}
+  .main-content{width:78%;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  .doc-panel{width:22%;height:100vh;background:var(--amber-bg);border-left:2px solid var(--amber-border);padding:24px 20px;overflow-y:auto;position:relative}
+
+  .proto-element{position:relative;transition:all .2s ease;border-radius:8px}
+  .proto-element:hover,.proto-element.active-highlight{box-shadow:0 0 0 2px var(--brand),0 4px 12px rgba(30,99,178,.15);background-color:rgba(30,99,178,.03)}
+  .proto-desc{transition:all .2s ease;border-radius:8px;border:1px solid var(--amber-border);background:#fff}
+  .proto-desc:hover,.proto-desc.active-highlight{background:#fef3c7;border-color:var(--amber-accent);box-shadow:0 2px 8px rgba(217,119,6,.15)}
+
+  #connections-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:50}
+  .connection-path{fill:none;stroke:var(--brand);stroke-width:2;opacity:.5;transition:all .25s ease}
+  .connection-path.active{stroke-width:3;opacity:1}
+  .conn-label-bg{fill:var(--brand)}
+  .conn-label-text{fill:#fff;font-size:11px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+
+  .sidebar{width:220px;min-width:220px;background:#fff;border-right:1px solid var(--slate-200);display:flex;flex-direction:column;position:relative;transition:width .3s,min-width .3s}
+  .sidebar.collapsed{width:48px;min-width:48px}
+
+  .topbar{height:48px;background:#fff;border-bottom:1px solid var(--slate-200);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
+  .topbar-breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--slate-500)}
+  .topbar-breadcrumb a{color:var(--slate-500);text-decoration:none;cursor:pointer}
+  .topbar-breadcrumb a:hover{color:var(--brand)}
+  .topbar-breadcrumb span.sep{color:var(--slate-400)}
+  .topbar-breadcrumb .current{color:var(--slate-700);font-weight:500}
+  .topbar-right{display:flex;align-items:center;gap:16px}
+  .org-name{font-size:13px;color:var(--slate-600);cursor:pointer}
+  .notify-bell{position:relative;cursor:pointer;color:var(--slate-500);font-size:17px}
+  .notify-bell .badge{position:absolute;top:-5px;right:-8px;background:var(--error);color:#fff;font-size:10px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:600}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;cursor:pointer}
+
+  .content-area{flex:1;overflow-y:auto;padding:24px;background:#F5F5F5}
+  .page-header{margin-bottom:24px}
+  .page-title{font-size:20px;font-weight:700;color:var(--slate-800)}
+
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s}
+  .btn-primary{background:var(--brand);color:#fff}
+  .btn-primary:hover{background:var(--brand-hover)}
+  .btn-outline{background:#fff;color:var(--brand);border:1px solid var(--brand)}
+  .btn-outline:hover{background:var(--brand-bg)}
+  .btn-cancel{background:#fff;color:var(--slate-600);border:1px solid var(--slate-300)}
+  .btn-cancel:hover{background:var(--slate-100)}
+  .btn-success{background:var(--success);color:#fff}
+  .btn-success:hover{background:#389E0D}
+
+  .card{background:#fff;border-radius:8px;border:1px solid var(--slate-200);margin-bottom:24px}
+  .card-header{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--slate-100)}
+  .card-header .card-num{width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-right:10px;flex-shrink:0}
+  .card-header .card-title{font-size:15px;font-weight:600;color:var(--slate-800)}
+  .card-body{padding:24px 20px}
+
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px}
+  .form-field{display:flex;flex-direction:column;gap:6px}
+  .form-field.full{grid-column:1/-1}
+  .form-field label{font-size:13px;font-weight:500;color:var(--slate-600)}
+  .form-field label .req{color:var(--error);margin-left:2px}
+  .form-field .hint{font-size:11px;color:var(--slate-400);margin-top:2px}
+  .form-field input,.form-field select,.form-field textarea{padding:8px 12px;border:1px solid var(--slate-300);border-radius:4px;font-size:14px;font-family:inherit;color:var(--slate-700);background:#fff}
+  .form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 3px rgba(30,99,178,.1)}
+  .form-field textarea{resize:vertical;min-height:80px}
+  .form-field select:disabled{background:var(--slate-100);color:var(--slate-500);cursor:not-allowed}
+
+  .radio-group{display:flex;align-items:center;gap:20px}
+  .radio-group label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;color:var(--slate-700)}
+  .radio-group input[type=radio]{width:16px;height:16px}
+
+  /* Advanced config */
+  .advanced-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--brand);font-size:13px;padding:6px 0;font-weight:500;border:none;background:none}
+  .advanced-toggle:hover{text-decoration:underline}
+  .advanced-area{display:none;padding:12px;border:1px solid var(--slate-200);border-radius:6px;background:var(--slate-50);margin-top:8px}
+  .advanced-area.show{display:block}
+
+  /* Test result inline */
+  .test-result{display:none;align-items:center;gap:8px;padding:8px 12px;border-radius:4px;margin-top:8px;font-size:13px}
+  .test-result.show{display:flex}
+  .test-result.success{background:rgba(82,196,26,.08);color:#389E0D;border:1px solid rgba(82,196,26,.2)}
+  .test-result.fail{background:rgba(245,34,45,.06);color:#CF1322;border:1px solid rgba(245,34,45,.15)}
+
+  .form-footer{display:flex;gap:8px;padding-top:16px;margin-top:24px;border-top:1px solid var(--slate-200);justify-content:flex-end}
+
+  /* L3 */
+  .l3-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1099;display:none;align-items:center;justify-content:center}
+  .l3-overlay.show{display:flex}
+  .l3-modal{background:#fff;border-radius:8px;width:420px;max-width:90vw;padding:32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.25)}
+  .l3-modal .icon-circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px}
+  .l3-modal .icon-circle.warn{background:rgba(250,173,20,.15);color:var(--warning)}
+  .l3-modal h4{font-size:16px;font-weight:600;color:var(--slate-800);margin-bottom:8px}
+  .l3-modal p{font-size:13px;color:var(--slate-500);line-height:1.6}
+  .l3-modal .btn-group{display:flex;gap:12px;margin-top:20px;justify-content:center}
+
+  .doc-panel h2{font-size:17px;font-weight:700;color:var(--slate-800);margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--amber-border)}
+  .doc-section{margin-bottom:20px;padding:12px 14px;background:#fff;border-radius:8px;border:1px solid var(--amber-border);font-size:13px;line-height:1.7;color:var(--slate-600);position:relative;transition:all .2s}
+  .doc-section .doc-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .doc-section .doc-label{font-weight:600;color:var(--slate-700);font-size:13px;margin-bottom:4px;display:flex;align-items:center}
+  .doc-section .doc-desc{font-size:12px;color:var(--slate-500)}
+
+  @media(max-width:768px){
+    .app-container{flex-direction:column}
+    .main-content{width:100%}
+    .doc-panel{width:100%;height:40vh;border-left:none;border-top:2px solid var(--amber-border)}
+    #connections-svg{display:none}
+    .sidebar{display:none}
+    .form-grid{grid-template-columns:1fr}
+  }
+
+  /* ===== Standard Sidebar ===== */
+  .sidebar { width: 220px; min-width: 220px; background: #fff; border-right: 1px solid var(--slate-200); display: flex; flex-direction: column; position: relative; transition: width 0.3s, min-width 0.3s; flex-shrink: 0; }
+  .sidebar.collapsed { width: 56px; min-width: 56px; }
+  .sidebar.collapsed .nav-text, .sidebar.collapsed .nav-group-title, .sidebar.collapsed .org-info-text, .sidebar.collapsed .logo-text { display: none; }
+  .sidebar-logo { height: 56px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--slate-200); cursor: pointer; gap: 10px; flex-shrink: 0; }
+  .sidebar-logo .logo-icon { width: 32px; height: 32px; background: var(--brand); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; flex-shrink: 0; }
+  .sidebar-logo .logo-text { font-size: 14px; font-weight: 700; color: var(--slate-800); white-space: nowrap; }
+  .sidebar-nav { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 0; }
+  .sidebar-nav::-webkit-scrollbar { width: 4px; }
+  .sidebar-nav::-webkit-scrollbar-thumb { background: var(--slate-300); border-radius: 2px; }
+  .nav-group { margin-bottom: 2px; }
+  .nav-group-title { padding: 12px 16px 4px; font-size: 11px; font-weight: 600; color: var(--slate-400); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+  .nav-item { padding: 9px 16px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--slate-600); cursor: pointer; transition: all 0.15s; border-right: 3px solid transparent; white-space: nowrap; }
+  .nav-item:hover { background: rgba(30,99,178,0.06); color: var(--brand); }
+  .nav-item.active { background: rgba(30,99,178,0.1); color: var(--brand); border-right-color: var(--brand); font-weight: 600; }
+  .nav-item i { width: 18px; text-align: center; font-size: 14px; flex-shrink: 0; }
+  .sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--slate-200); font-size: 12px; color: var(--slate-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+  .sidebar-footer i { margin-right: 6px; color: var(--slate-400); }
+  .collapse-toggle { position: absolute; bottom: 56px; right: -12px; width: 24px; height: 24px; background: #fff; border: 1px solid var(--slate-200); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 10px; color: var(--slate-500); z-index: 20; transition: all 0.15s; }
+  .collapse-toggle:hover { background: rgba(30,99,178,0.06); color: var(--brand); border-color: var(--brand); }
+  .collapse-toggle i { transition: transform 0.3s; }
+
+</style>
+</head>
+<body>
+
+
+
+<div class="app-container" id="appContainer">
+  <div class="main-content" id="leftPanel">
+    <div style="display:flex;flex:1;overflow:hidden">
+              <aside class="sidebar" id="stdSidebar">
+          <div class="sidebar-logo" onclick="location.href='W0-工作台仪表盘.html'">
+            <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+            <span class="logo-text">数据空间平台</span>
+          </div>
+          <nav class="sidebar-nav">
+                      <div class="nav-item" onclick="location.href='W0-工作台仪表盘.html'">
+              <i class="fas fa-house"></i><span class="nav-text">首页</span>
+            </div>
+                      <div class="nav-group-title">身份与接入</div>
+                      <div class="nav-item" onclick="location.href='W1-身份信息页.html'">
+              <i class="fas fa-id-card"></i><span class="nav-text">身份信息</span>
+            </div>
+                      <div class="nav-item" onclick="location.href='W2-凭证管理页.html'">
+              <i class="fas fa-certificate"></i><span class="nav-text">凭证管理</span>
+            </div>
+                      <div class="nav-item" onclick="location.href='W3-连接器列表页.html'">
+              <i class="fas fa-plug"></i><span class="nav-text">我的连接器</span>
+            </div>
+                      <div class="nav-group-title">数据管理</div>
+                      <div class="nav-item active" onclick="location.href='W5-接入列表页.html'">
+              <i class="fas fa-cloud-arrow-up"></i><span class="nav-text">数据接入</span>
+            </div>
+                      <div class="nav-item" onclick="location.href='W8-数据资源页.html'">
+              <i class="fas fa-database"></i><span class="nav-text">数据资源</span>
+            </div>
+                      <div class="nav-item" onclick="location.href='W9-数据产品页.html'">
+              <i class="fas fa-boxes-stacked"></i><span class="nav-text">数据产品</span>
+            </div>
+                      <div class="nav-group-title">空间与市场</div>
+    <div class="nav-item" onclick="location.href='W13-空间列表页.html'">
+      <i class="fas fa-object-group"></i><span class="nav-text">我的空间</span>
+    </div>
+    <div class="nav-item" onclick="location.href='W11-空间目录页.html'">
+      <i class="fas fa-globe"></i><span class="nav-text">数据市场目录</span>
+    </div>
+    <div class="nav-item" onclick="location.href='W12-申请记录页.html'">
+      <i class="fas fa-file-circle-check"></i><span class="nav-text">申请记录</span>
+    </div>
+    <div class="nav-group-title">合约与交付</div>
+    <div class="nav-item" onclick="location.href='W18-合约列表页.html'">
+      <i class="fas fa-file-contract"></i><span class="nav-text">合约管理</span>
+    </div>
+    <div class="nav-item" onclick="location.href='W21-任务列表页.html'">
+      <i class="fas fa-list-check"></i><span class="nav-text">交付任务</span>
+    </div>
+    <div class="nav-group-title">其他</div>
+    <div class="nav-item" onclick="location.href='W24-需求列表页.html'">
+      <i class="fas fa-bullhorn"></i><span class="nav-text">我的需求</span>
+    </div>
+    <div class="nav-item" onclick="location.href='W27-存证列表页.html'">
+      <i class="fas fa-shield-halved"></i><span class="nav-text">存证记录</span>
+    </div>
+          </nav>
+          <div class="sidebar-footer">
+            <i class="fas fa-building"></i><span class="org-info-text">XX环境科学研究院</span>
+          </div>
+          <div class="collapse-toggle" onclick="toggleStdSidebar(this)">
+            <i class="fas fa-chevron-left"></i>
+          </div>
+        </aside>
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+        <header class="topbar">
+          <div class="topbar-breadcrumb">
+            <i class="fas fa-home" style="color:var(--slate-400);font-size:12px"></i>
+            <a onclick="location.href='W0-工作台仪表盘.html'">首页</a><span class="sep">/</span>
+            <a onclick="location.href='W5-接入列表页.html'">数据接入</a><span class="sep">/</span>
+            <span class="current">新增接入</span>
+          </div>
+          <div class="topbar-right">
+            <div class="notify-bell"><i class="fas fa-bell"></i><span class="badge">5</span></div>
+            <span class="org-name">XX数据科技有限公司 <i class="fas fa-caret-down" style="font-size:10px;margin-left:2px"></i></span>
+            <div class="user-avatar">张</div>
+          </div>
+        </header>
+
+        <div class="content-area">
+          <div class="page-header" style="display:flex;align-items:center;justify-content:space-between"><div class="page-title">新增数据接入</div><button class="btn btn-cancel" onclick="location.href='W5-接入列表页.html'"><i class="fas fa-arrow-left"></i> 返回数据接入</button></div>
+
+          <!-- ===== 第一组：选择连接器 ===== -->
+          <div class="proto-element card" data-proto-id="1">
+            <div class="card-header">
+              <span class="card-num">1</span>
+              <span class="card-title">选择连接器</span>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-field">
+                  <label>所属连接器 <span class="req">*</span></label>
+                  <select id="connector">
+                    <option value="">请选择连接器</option>
+                    <option>主数据中心接入连接器</option>
+                    <option>政务数据共享连接器</option>
+                    <option>TEE 安全计算连接器</option>
+                  </select>
+                  <span class="hint">仅列出本机构运行中的连接器</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== 第二组：连接配置 ===== -->
+          <div class="proto-element card" data-proto-id="2">
+            <div class="card-header">
+              <span class="card-num">2</span>
+              <span class="card-title">连接配置</span>
+            </div>
+            <div class="card-body">
+              <div class="form-grid" id="connConfigGrid">
+                <div class="form-field">
+                  <label>数据源类型 <span class="req">*</span></label>
+                  <select id="dsType" onchange="onTypeChange()">
+                    <option value="">请选择数据源类型</option>
+                    <option value="db">数据库</option>
+                    <option value="api">API 接口</option>
+                    <option value="fs">文件系统（FTP/SFTP）</option>
+                  </select>
+                </div>
+                <div class="form-field full">
+                  <label>连接地址 <span class="req">*</span></label>
+                  <input type="text" id="dsAddr" placeholder="根据类型：jdbc连接串 / API请求地址 / 文件服务器地址">
+                </div>
+                <div class="form-field field-port">
+                  <label>端口 <span class="req">*</span></label>
+                  <input type="text" id="dsPort" placeholder="3306/5432/22/21">
+                </div>
+                <div class="form-field field-dbname">
+                  <label>数据库/目录名 <span class="req">*</span></label>
+                  <input type="text" id="dsDbName" placeholder="目标数据库名或目录路径">
+                </div>
+                <div class="form-field">
+                  <label>用户名 <span class="req">*</span></label>
+                  <input type="text" id="dsUser" placeholder="连接认证用户名">
+                </div>
+                <div class="form-field">
+                  <label>密码 <span class="req">*</span></label>
+                  <input type="password" id="dsPwd" placeholder="连接密码，加密存储">
+                </div>
+                <div class="form-field full">
+                  <button class="advanced-toggle" onclick="toggleAdvanced()"><i class="fas fa-cog"></i> 高级配置 <i class="fas fa-chevron-down" id="advIcon"></i></button>
+                  <div class="advanced-area" id="advArea">
+                    <div class="form-grid">
+                      <div class="form-field"><label>连接池大小</label><input type="text" placeholder="默认 10"></div>
+                      <div class="form-field"><label>超时时间（秒）</label><input type="text" placeholder="默认 30"></div>
+                      <div class="form-field"><label>最大重试次数</label><input type="text" placeholder="默认 3"></div>
+                      <div class="form-field"><label>字符编码</label><select><option>UTF-8</option><option>GBK</option><option>GB2312</option></select></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-field full">
+                  <button class="btn btn-success" onclick="runConnTest()"><i class="fas fa-plug"></i> 连接测试</button>
+                  <div class="test-result" id="testResult"><i class="fas fa-check-circle"></i><span id="testResultMsg"></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          </div>
+
+          <!-- 表单底部按钮 -->
+          <div class="form-footer">
+            <button class="btn btn-cancel" onclick="location.href='W5-接入列表页.html'"><i class="fas fa-arrow-left"></i> 返回</button>
+            <button class="btn btn-outline" onclick="saveDraft()"><i class="fas fa-save"></i> 保存草稿</button>
+            <button class="btn btn-primary" onclick="confirmSubmit()"><i class="fas fa-paper-plane"></i> 提交接入</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:1px;background:var(--amber-border);flex-shrink:0"></div>
+
+  <div class="doc-panel" id="rightPanel">
+    <div style="margin-bottom:14px;padding:10px 12px;background:var(--amber-border);border-radius:6px;display:flex;align-items:center;gap:8px">
+      <span style="background:var(--amber-accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px">PROTOTYPE</span>
+      <span style="font-size:12px;font-weight:600;color:var(--amber-accent)">W6 新增接入页</span>
+    </div>
+    <h2>功能说明文档</h2>
+    <div class="proto-desc doc-section" data-proto-desc="1"><div class="doc-label"><span class="doc-num">1</span> 选择连接器</div><div class="doc-desc">下拉单选从本机构运行中连接器列表选择。连接器为必选前置条件，无运行中连接器时需先去 W3 申请。选中的连接器将作为该数据源的底层通信通道。</div></div>
+    <div class="proto-desc doc-section" data-proto-desc="2"><div class="doc-label"><span class="doc-num">2</span> 连接配置</div><div class="doc-desc">根据数据源类型（数据库/API接口/文件系统）动态调整表单字段。数据库和文件系统展示全部字段（地址/端口/数据库名/用户名/密码）；API类型隐藏端口和数据库名字段。高级配置可展开设置连接池大小、超时时间、最大重试次数和字符编码。底部「连接测试」按钮即时测试连通性，返回成功/失败结果。</div></div>
+    <div class="doc-section" style="margin-top:16px;border-left:3px solid var(--brand)">
+      <div class="doc-label" style="color:var(--brand)"><i class="fas fa-info-circle" style="margin-right:6px"></i>交互规则</div>
+      <div class="doc-desc" style="margin-top:4px">
+        - 两组表单在同一页面上下排列，不分步向导<br>
+        - 提交接入时自动执行连接测试，通过后触发元数据抽取<br>
+        - 提交成功后数据源出现在 W5 列表<br>
+      </div>
+    </div>
+  </div>
+  <svg id="connections-svg"></svg>
+</div>
+
+<!-- L3 确认 -->
+<div class="l3-overlay" id="l3Overlay">
+  <div class="l3-modal">
+    <div class="icon-circle warn"><i class="fas fa-exclamation-triangle"></i></div>
+    <h4>确认提交数据接入？</h4>
+    <p>提交后系统将自动执行连接测试和元数据抽取，<br>接入完成后可在数据接入列表查看。</p>
+    <div class="btn-group">
+      <button class="btn btn-cancel" onclick="closeL3()">取消</button>
+      <button class="btn btn-primary" onclick="submitAccess()">确认提交</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const connections=[
+  {id:1,selector:'[data-proto-id="1"]',descSelector:'[data-proto-desc="1"]'},
+  {id:2,selector:'[data-proto-id="2"]',descSelector:'[data-proto-desc="2"]'}
+];
+function drawConnections(){
+  const svg=document.getElementById('connections-svg');if(!svg)return;
+  const cr=document.getElementById('appContainer').getBoundingClientRect();
+  svg.setAttribute('viewBox',`0 0 ${cr.width} ${cr.height}`);
+  svg.style.width=cr.width+'px';svg.style.height=cr.height+'px';
+  let html='';
+  connections.forEach(c=>{
+    const l=document.querySelector(c.selector),r=document.querySelector(c.descSelector);
+    if(!l||!r)return;
+    const lr=l.getBoundingClientRect(),rr=r.getBoundingClientRect();
+    const x1=lr.right-cr.left,y1=lr.top+lr.height/2-cr.top,x2=rr.left-cr.left,y2=rr.top+rr.height/2-cr.top;
+    html+=`<path class="connection-path" id="conn-path-${c.id}" d="M ${x1} ${y1} C ${x1+(x2-x1)*.4} ${y1}, ${x1+(x2-x1)*.6} ${y2}, ${x2} ${y2}" data-conn="${c.id}"/>`;
+    const mx=x1+(x2-x1)*.5,my=y1+(y2-y1)*.5;
+    html+=`<circle cx="${mx}" cy="${my}" r="9" class="conn-label-bg"/><text x="${mx}" y="${my}" class="conn-label-text">${c.id}</text>`;
+  });
+  svg.innerHTML=html;
+}
+function setupConnHover(){
+  document.querySelectorAll('.proto-element').forEach(el=>{
+    const pid=el.getAttribute('data-proto-id');if(!pid)return;
+    el.addEventListener('mouseenter',()=>{
+      const p=document.getElementById('conn-path-'+pid),d=document.querySelector('[data-proto-desc="'+pid+'"]');
+      if(p)p.classList.add('active');if(d)d.classList.add('active-highlight');
+    });
+    el.addEventListener('mouseleave',()=>{
+      const p=document.getElementById('conn-path-'+pid),d=document.querySelector('[data-proto-desc="'+pid+'"]');
+      if(p)p.classList.remove('active');if(d)d.classList.remove('active-highlight');
+    });
+  });
+  document.querySelectorAll('.proto-desc').forEach(el=>{
+    const pid=el.getAttribute('data-proto-desc');if(!pid)return;
+    el.addEventListener('mouseenter',()=>{
+      const p=document.getElementById('conn-path-'+pid),pr=document.querySelector('[data-proto-id="'+pid+'"]');
+      if(p)p.classList.add('active');if(pr)pr.classList.add('active-highlight');
+    });
+    el.addEventListener('mouseleave',()=>{
+      const p=document.getElementById('conn-path-'+pid),pr=document.querySelector('[data-proto-id="'+pid+'"]');
+      if(p)p.classList.remove('active');if(pr)pr.classList.remove('active-highlight');
+    });
+  });
+}
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar'),ic=document.getElementById('collapseIcon');
+  sb.classList.toggle('collapsed');
+  ic.className=sb.classList.contains('collapsed')?'fas fa-chevron-right':'fas fa-chevron-left';
+  setTimeout(drawConnections,350);
+}
+function onTypeChange(){
+  const type=document.getElementById('dsType').value;
+  document.querySelectorAll('.field-port,.field-dbname').forEach(el=>{
+    if(type==='api')el.style.display='none';else el.style.display='';
+  });
+}
+function toggleAdvanced(){
+  const area=document.getElementById('advArea'),icon=document.getElementById('advIcon');
+  area.classList.toggle('show');
+  icon.className=area.classList.contains('show')?'fas fa-chevron-up':'fas fa-chevron-down';
+}
+function runConnTest(){
+  const type=document.getElementById('dsType').value;
+  const result=document.getElementById('testResult'),msg=document.getElementById('testResultMsg');
+  if(!type){alert('请先选择数据源类型');return}
+  result.className='test-result';
+  result.classList.add('show');
+  if(type==='db'){
+    result.classList.add('success');
+    result.querySelector('i').className='fas fa-check-circle';
+    msg.textContent='连接测试成功 — 数据库连接正常，耗时 12ms';
+  }else{
+    result.classList.add('success');
+    result.querySelector('i').className='fas fa-check-circle';
+    msg.textContent='连接测试成功 — 服务可达，响应状态码 200';
+  }
+}
+function saveDraft(){alert('草稿已保存')}
+function confirmSubmit(){document.getElementById('l3Overlay').classList.add('show')}
+function closeL3(){document.getElementById('l3Overlay').classList.remove('show')}
+function submitAccess(){closeL3();alert('接入已提交，正在抽取元数据... 数据源将出现在 W5 接入列表中。')}
+
+  else{r.style.display='none';l.style.height='100vh'}
+}
+window.addEventListener('DOMContentLoaded',()=>{drawConnections();setupConnHover()});
+window.addEventListener('resize',drawConnections);
+</script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>W0 工作台仪表盘 — 数据空间平台</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- SCAFFOLD:CSS -->
+
+<style>
+  /* ===== W0 页面特有样式（指标卡、快捷操作等，非公共） ===== */
+  .metric-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .metric-card { background: #fff; border-radius: 8px; border: 1px solid var(--slate-200); padding: 20px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; gap: 8px; }
+  .metric-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-color: var(--brand); transform: translateY(-2px); }
+  .metric-card .metric-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .metric-card .metric-value { font-size: 28px; font-weight: 700; color: var(--slate-800); line-height: 1; }
+  .metric-card .metric-label { font-size: 13px; color: var(--slate-500); }
+  .metric-card .metric-trend { font-size: 12px; color: var(--slate-400); }
+  .metric-card .metric-trend.up { color: var(--success); }
+  .metric-card .metric-trend.down { color: var(--error); }
+
+  .quick-actions { display: flex; gap: 16px; margin-bottom: 24px; }
+  .quick-action-card {
+    width: 120px; height: 100px; background: #fff; border-radius: 8px;
+    border: 1px solid var(--slate-200); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quick-action-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-2px); background: var(--brand-bg); border-color: var(--brand-border); }
+  .quick-action-card i { font-size: 36px; color: var(--brand); }
+  .quick-action-card span { font-size: 14px; color: var(--slate-700); font-weight: 500; }
+
+  /* W0 特有响应式 */
+  @media (max-width: 768px) {
+    .metric-cards { grid-template-columns: repeat(2, 1fr); }
+    .quick-actions { flex-wrap: wrap; }
+  }
+  @media (max-width: 1280px) {
+    .metric-cards { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container" id="appContainer">
+
+  <!-- ==================== 左侧：产品界面 ==================== -->
+  <div class="main-content" id="leftPanel">
+
+    <!-- 侧边栏 + 内容区 横排 -->
+    <div style="display:flex; flex:1; overflow:hidden;">
+
+      <!-- 左侧导航栏（公共侧边栏） -->
+      <!-- SCAFFOLD:SIDEBAR -->
+
+      <!-- 主内容 -->
+      <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+        <!-- 顶部信息栏 -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <i class="fas fa-home" style="color:var(--slate-400);"></i>
+            <span>首页</span>
+          </div>
+          <div class="topbar-right">
+            <div class="notify-bell">
+              <i class="fas fa-bell"></i>
+              <span class="badge">5</span>
+            </div>
+            <span class="org-name">XX数据科技有限公司 <i class="fas fa-caret-down" style="font-size:10px;margin-left:2px;"></i></span>
+            <div class="user-avatar">张</div>
+          </div>
+        </header>
+
+        <!-- 内容区 -->
+        <div class="content-area">
+
+          <!-- 页面标题 -->
+          <div class="page-title">工作台</div>
+          <div class="page-subtitle">下午好，张管理。以下是您机构的数据空间运营概览。</div>
+
+          <!-- 概览指标行 -->
+          <div class="proto-element metric-cards" data-proto-id="1">
+            <div class="metric-card" onclick="navigateTo('#')">
+              <div class="metric-icon" style="background:rgba(30,99,178,0.1); color:var(--brand);"><i class="fas fa-database"></i></div>
+              <div class="metric-value">128</div>
+              <div class="metric-label">我的数据资源</div>
+              <div class="metric-trend up"><i class="fas fa-arrow-up"></i> +12 本月</div>
+            </div>
+            <div class="metric-card" onclick="navigateTo('#')">
+              <div class="metric-icon" style="background:rgba(82,196,26,0.1); color:var(--success);"><i class="fas fa-boxes"></i></div>
+              <div class="metric-value">36</div>
+              <div class="metric-label">我的数据产品</div>
+              <div class="metric-trend up"><i class="fas fa-arrow-up"></i> +5 本月</div>
+            </div>
+            <div class="metric-card" onclick="navigateTo('#')">
+              <div class="metric-icon" style="background:rgba(250,173,20,0.1); color:var(--warning);"><i class="fas fa-clipboard-check"></i></div>
+              <div class="metric-value">8</div>
+              <div class="metric-label">待处理审批</div>
+              <div class="metric-trend down"><i class="fas fa-minus"></i> 持平</div>
+            </div>
+            <div class="metric-card" onclick="navigateTo('#')">
+              <div class="metric-icon" style="background:rgba(114,46,209,0.1); color:#722ED1;"><i class="fas fa-tasks"></i></div>
+              <div class="metric-value">15</div>
+              <div class="metric-label">进行中任务</div>
+              <div class="metric-trend up"><i class="fas fa-arrow-up"></i> +3 本月</div>
+            </div>
+          </div>
+
+          <!-- 快捷操作区 -->
+          <div class="proto-element quick-actions" data-proto-id="2">
+            <div class="quick-action-card" onclick="navigateTo('#')">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <span>接入数据</span>
+            </div>
+            <div class="quick-action-card" onclick="navigateTo('#')">
+              <i class="fas fa-paper-plane"></i>
+              <span>发布数据产品</span>
+            </div>
+            <div class="quick-action-card" onclick="navigateTo('#')">
+              <i class="fas fa-globe"></i>
+              <span>创建空间</span>
+            </div>
+            <div class="quick-action-card" onclick="navigateTo('#')">
+              <i class="fas fa-play-circle"></i>
+              <span>发起任务</span>
+            </div>
+            <div class="quick-action-card" onclick="navigateTo('#')">
+              <i class="fas fa-bullhorn"></i>
+              <span>发布需求</span>
+            </div>
+          </div>
+
+          <!-- 待办与最近任务 双栏 -->
+          <div class="two-col">
+            <!-- 待办事项区 -->
+            <div class="proto-element card" data-proto-id="3" style="overflow:hidden;">
+              <div class="section-header" style="padding:16px 16px 0;">
+                <span class="section-title">待办事项<span class="badge-count">8</span></span>
+                <span class="section-link" onclick="navigateTo('#')">查看全部 <i class="fas fa-arrow-right" style="font-size:10px;"></i></span>
+              </div>
+              <div class="tabs" style="padding:0 16px;">
+                <button class="tab-item active" onclick="switchTodoTab(this,'all')">全部</button>
+                <button class="tab-item" onclick="switchTodoTab(this,'auth')">授权审批</button>
+                <button class="tab-item" onclick="switchTodoTab(this,'publish')">发布审核</button>
+                <button class="tab-item" onclick="switchTodoTab(this,'contract')">合约待签</button>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width:80px;">类型</th>
+                      <th>标题</th>
+                      <th style="width:120px;">发起方</th>
+                      <th style="width:110px;">提交时间</th>
+                      <th style="width:60px;text-align:center;">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="todoTableBody">
+                    <tr>
+                      <td><span class="tag tag-orange">授权审批</span></td>
+                      <td>申请使用"政务数据资源共享目录-2026Q1"数据产品</td>
+                      <td>智慧城市运营中心</td>
+                      <td>32 分钟前</td>
+                      <td style="text-align:center;"><span class="action-link" onclick="navigateTo('#')">处理</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="tag tag-blue">发布审核</span></td>
+                      <td>提交"交通流量热力数据集V3"产品上架审核</td>
+                      <td>XX数科</td>
+                      <td>2 小时前</td>
+                      <td style="text-align:center;"><span class="action-link" onclick="navigateTo('#')">处理</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="tag tag-purple">合约待签</span></td>
+                      <td>数据产品"城市碳排放监测数据服务"使用合约</td>
+                      <td>碳中和研究中心</td>
+                      <td>5 小时前</td>
+                      <td style="text-align:center;"><span class="action-link" onclick="navigateTo('#')">处理</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="tag tag-orange">授权审批</span></td>
+                      <td>申请"环境监测站点数据"MPC计算授权</td>
+                      <td>环境科学研究院</td>
+                      <td>昨天 14:30</td>
+                      <td style="text-align:center;"><span class="action-link" onclick="navigateTo('#')">处理</span></td>
+                    </tr>
+                    <tr>
+                      <td><span class="tag tag-blue">发布审核</span></td>
+                      <td>提交"企业信用评估数据产品"上架审核</td>
+                      <td>征信服务中心</td>
+                      <td>昨天 09:15</td>
+                      <td style="text-align:center;"><span class="action-link" onclick="navigateTo('#')">处理</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 最近任务区 -->
+            <div class="proto-element card" data-proto-id="4" style="overflow:hidden;">
+              <div class="section-header" style="padding:16px 16px 0;">
+                <span class="section-title">最近任务</span>
+                <span class="section-link" onclick="navigateTo('#')">查看全部 <i class="fas fa-arrow-right" style="font-size:10px;"></i></span>
+              </div>
+              <div class="table-wrap" style="padding:0;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>任务名称</th>
+                      <th style="width:90px;">交付方式</th>
+                      <th style="width:80px;">状态</th>
+                      <th style="width:110px;">更新时间</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>政务数据资源可信共享交付-20260601</td>
+                      <td><span class="tag tag-blue">可信共享</span></td>
+                      <td><span class="tag tag-orange">执行中</span></td>
+                      <td>10 分钟前</td>
+                    </tr>
+                    <tr>
+                      <td>碳排放数据MPC联合计算-0528</td>
+                      <td><span class="tag tag-purple">MPC</span></td>
+                      <td><span class="tag tag-blue">可执行</span></td>
+                      <td>1 小时前</td>
+                    </tr>
+                    <tr>
+                      <td>TEE环境数据隐私计算-0525</td>
+                      <td><span class="tag tag-green">TEE</span></td>
+                      <td><span class="tag tag-green">已完成</span></td>
+                      <td>昨天 16:20</td>
+                    </tr>
+                    <tr>
+                      <td>信用数据可信共享交付-0522</td>
+                      <td><span class="tag tag-blue">可信共享</span></td>
+                      <td><span class="tag tag-green">已完成</span></td>
+                      <td>2026-05-22</td>
+                    </tr>
+                    <tr>
+                      <td>交通流量MPC联合分析-0520</td>
+                      <td><span class="tag tag-purple">MPC</span></td>
+                      <td><span class="tag tag-red">已失败</span></td>
+                      <td>2026-05-20</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /content-area -->
+      </div><!-- /flex-1 -->
+    </div><!-- /flex row -->
+  </div><!-- /main-content -->
+
+  <!-- 分隔线 -->
+  <div style="width:1px; background:var(--amber-border); flex-shrink:0;"></div>
+
+  <!-- ==================== 右侧：功能说明文档 ==================== -->
+  <div class="doc-panel" id="rightPanel">
+    <div style="margin-bottom:14px; padding:10px 12px; background:var(--amber-border); border-radius:6px; display:flex; align-items:center; gap:8px;">
+      <span style="background:var(--amber-accent); color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:3px;">PROTOTYPE</span>
+      <span style="font-size:12px; font-weight:600; color:var(--amber-accent);">W0 工作台仪表盘</span>
+    </div>
+    <h2>功能说明文档</h2>
+
+    <div class="proto-desc doc-section" data-proto-desc="1">
+      <div class="doc-label"><span class="doc-num">1</span> 概览指标卡片</div>
+      <div class="doc-desc">4个等宽指标卡片展示本机构核心数字——数据资源数、数据产品数、待处理审批数、进行中任务数。每卡显示图标、数值、标签和本月变化趋势。点击整卡跳转至对应列表页。纯展示，不可编辑。</div>
+    </div>
+
+    <div class="proto-desc doc-section" data-proto-desc="2">
+      <div class="doc-label"><span class="doc-num">2</span> 快捷操作入口</div>
+      <div class="doc-desc">5个快捷操作卡片（120×100px），图标+居中文字，悬停上浮2px并浅蓝背景。点击跳转至接入数据、发布产品、创建空间、发起任务、发布需求等功能页。</div>
+    </div>
+
+    <div class="proto-desc doc-section" data-proto-desc="3">
+      <div class="doc-label"><span class="doc-num">3</span> 待办事项列表</div>
+      <div class="doc-desc">按Tab切换类型（全部/授权审批/发布审核/合约待签），每类最多展示5条。每条显示类型标签（橙/蓝/紫）、标题、发起方、相对时间和「处理」按钮。超出点击「查看全部」跳转审批列表。</div>
+    </div>
+
+    <div class="proto-desc doc-section" data-proto-desc="4">
+      <div class="doc-label"><span class="doc-num">4</span> 最近任务列表</div>
+      <div class="doc-desc">展示本机构最近10条交付任务，简化显示任务名称、交付方式（可信共享/MPC/TEE标签）、状态（蓝可执行/橙执行中/绿已完成/红已失败）和更新时间。点击「查看全部」跳转任务列表页。</div>
+    </div>
+
+    <div class="doc-section" style="margin-top:16px; border-left:3px solid var(--brand);">
+      <div class="doc-label" style="color:var(--brand);"><i class="fas fa-info-circle" style="margin-right:6px;"></i>交互规则要点</div>
+      <div class="doc-desc" style="margin-top:4px;">
+        - 仪表盘纯展示，无增删改操作<br>
+        - 数据每60秒自动刷新<br>
+        - 左侧导航支持折叠至48px图标模式<br>
+        - 最小宽度1280px，低于此宽度指标卡片2×2排列
+      </div>
+    </div>
+  </div>
+
+  <!-- SVG 连线层 -->
+  <svg id="connections-svg"></svg>
+
+</div><!-- /app-container -->
+
+<!-- SCAFFOLD:JS -->
+
+<script>
+// ==================== W0 页面特有：连线配置 + 待办Tab + 导航 ====================
+window.connections = [
+  { id: 1, selector: '[data-proto-id="1"]', descSelector: '[data-proto-desc="1"]' },
+  { id: 2, selector: '[data-proto-id="2"]', descSelector: '[data-proto-desc="2"]' },
+  { id: 3, selector: '[data-proto-id="3"]', descSelector: '[data-proto-desc="3"]' },
+  { id: 4, selector: '[data-proto-id="4"]', descSelector: '[data-proto-desc="4"]' }
+];
+
+// ==================== 待办Tab切换 ====================
+function switchTodoTab(btn, type) {
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  console.log('Switched to todo tab:', type);
+}
+
+// ==================== 导航跳转 ====================
+function navigateTo(url) {
+  console.log('Navigate to:', url);
+}
+</script>
+
+</body>
+</html>

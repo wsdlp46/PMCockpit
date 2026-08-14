@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>scaffold 组件片段参考 — proto-base.css 对应</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="proto-base.css">
+<style>
+  body { background: #F5F5F5; padding: 32px; }
+  .demo-section { margin-bottom: 40px; }
+  .demo-section > h2 { font-size: 18px; font-weight: 700; color: var(--slate-800); margin-bottom: 4px; }
+  .demo-section > .demo-cls { font-size: 12px; color: var(--slate-400); font-family: "SF Mono", Menlo, monospace; margin-bottom: 16px; }
+  .demo-frame { background: #fff; border: 1px solid var(--slate-200); border-radius: 8px; padding: 20px; }
+  .demo-frame-dark { background: var(--slate-800); border: none; }
+  .demo-note { font-size: 12px; color: var(--slate-400); margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<h1 style="font-size:24px;font-weight:700;color:var(--slate-800);margin-bottom:8px;">scaffold 组件片段参考</h1>
+<p style="color:var(--slate-500);font-size:14px;margin-bottom:32px;">基于 proto-base.css，每个组件展示标准 HTML 结构。画原型时复制片段，替换数据内容即可。class 名保持不变。</p>
+
+<!-- ============ 布局骨架 ============ -->
+<div class="demo-section">
+  <h2>布局骨架</h2>
+  <div class="demo-cls">.app-container > .main-content(78%) + .doc-panel(22%)</div>
+  <div class="demo-frame" style="padding:0;overflow:hidden;">
+    <div class="app-container" style="height:200px;">
+      <div class="main-content">
+        <div style="padding:20px;color:var(--slate-500);font-size:13px;">主内容区 78%<br>放侧边栏 + 内容</div>
+      </div>
+      <div class="doc-panel">
+        <h2 style="font-size:14px;">功能说明</h2>
+        <div style="font-size:12px;color:var(--slate-500);">右侧说明区 22%</div>
+      </div>
+    </div>
+  </div>
+  <div class="demo-note">src.html 里用占位符：&lt;!-- SCAFFOLD:SIDEBAR --&gt; 注入侧边栏，&lt;!-- SCAFFOLD:CSS/JS --&gt; 注入样式和脚本</div>
+</div>
+
+<!-- ============ 顶栏 ============ -->
+<div class="demo-section">
+  <h2>顶栏</h2>
+  <div class="demo-cls">.topbar > .topbar-left（面包屑） + .topbar-right（通知+用户）</div>
+  <div class="demo-frame" style="padding:0;overflow:hidden;">
+    <header class="topbar">
+      <div class="topbar-left"><i class="fas fa-home" style="color:var(--slate-400);"></i><span>首页</span><i class="fas fa-chevron-right" style="font-size:9px;color:var(--slate-300);"></i><span>接入管理</span><i class="fas fa-chevron-right" style="font-size:9px;color:var(--slate-300);"></i><span style="color:var(--slate-700);">用户管理</span></div>
+      <div class="topbar-right"><div class="notify-bell"><i class="fas fa-bell"></i><span class="badge">3</span></div><span class="org-name">平台管理员 <i class="fas fa-caret-down" style="font-size:10px;margin-left:2px;"></i></span><div class="user-avatar">管</div></div>
+    </header>
+  </div>
+</div>
+
+<!-- ============ 页面标题 ============ -->
+<div class="demo-section">
+  <h2>页面标题</h2>
+  <div class="demo-cls">.page-title + .page-subtitle</div>
+  <div class="demo-frame">
+    <div class="page-title">用户管理</div>
+    <div class="page-subtitle">管理各机构下可登录工作台的用户账号，支持查看详情、冻结/恢复、注销。</div>
+  </div>
+</div>
+
+<!-- ============ Section Header ============ -->
+<div class="demo-section">
+  <h2>Section Header（区块标题+操作）</h2>
+  <div class="demo-cls">.section-header > .section-title + .section-link / .badge-count</div>
+  <div class="demo-frame">
+    <div class="section-header">
+      <div class="section-title">部门关系 <span class="badge-count">3</span></div>
+      <span class="section-link">查看全部</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 卡片 ============ -->
+<div class="demo-section">
+  <h2>内容卡片</h2>
+  <div class="demo-cls">.card > .card-title（可选）+ 内容</div>
+  <div class="demo-frame">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-title"><i class="fas fa-info-circle"></i> 基本信息</div>
+      <p style="font-size:13px;color:var(--slate-600);">卡片内容区，padding:24px。card-title 带底部边框和图标。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 表格 ============ -->
+<div class="demo-section">
+  <h2>数据表格</h2>
+  <div class="demo-cls">.table-wrap > table.data-table</div>
+  <div class="demo-frame" style="padding:0;overflow:hidden;">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>名称</th><th>状态</th><th>更新时间</th><th style="text-align:center;">操作</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:500;color:var(--slate-800);">示例数据A</td><td><span class="tag tag-green">启用</span></td><td>2026-07-08 10:30</td><td style="text-align:center;"><span class="action-link">查看</span> <span style="color:var(--slate-300);margin:0 2px;">|</span> <span class="action-link">编辑</span> <span style="color:var(--slate-300);margin:0 2px;">|</span> <span class="action-link" style="color:var(--error);">删除</span></td></tr>
+          <tr><td style="font-weight:500;color:var(--slate-800);">示例数据B</td><td><span class="tag tag-orange">待审核</span></td><td>2026-07-07 16:20</td><td style="text-align:center;"><span class="action-link">查看</span></td></tr>
+          <tr><td style="color:var(--slate-500);">示例数据C</td><td><span class="tag tag-gray">停用</span></td><td>2026-07-06 09:15</td><td style="text-align:center;"><span class="action-link">查看</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="demo-note">表头 #F6F6F6、斑马纹 #FBFBFC、hover 主色浅底。操作列顺序：查看→修改→其他→关闭→删除，用 | 分隔，删除用 error 色。</div>
+</div>
+
+<!-- ============ Tag ============ -->
+<div class="demo-section">
+  <h2>Tag 状态标签（六色）</h2>
+  <div class="demo-cls">.tag + .tag-{orange|blue|purple|green|red|gray}</div>
+  <div class="demo-frame">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <span class="tag tag-green">已通过/启用/生效</span>
+      <span class="tag tag-blue">进行中/处理中</span>
+      <span class="tag tag-orange">待审核/待处理</span>
+      <span class="tag tag-red">已驳回/失败/异常</span>
+      <span class="tag tag-purple">特殊/自定义</span>
+      <span class="tag tag-gray">草稿/停用/默认</span>
+    </div>
+    <div class="demo-note">语义映射：绿=成功/启用，蓝=进行中，橙=待处理，红=失败/危险，紫=特殊，灰=中性/默认</div>
+  </div>
+</div>
+
+<!-- ============ 状态色点 ============ -->
+<div class="demo-section">
+  <h2>状态色点（表格行内轻量标记）</h2>
+  <div class="demo-cls">.status-dot + .dot-{green|orange|gray}</div>
+  <div class="demo-frame">
+    <div style="font-size:13px;color:var(--slate-700);display:flex;gap:20px;">
+      <span><span class="status-dot dot-green"></span>正常</span>
+      <span><span class="status-dot dot-orange"></span>待审核</span>
+      <span><span class="status-dot dot-gray"></span>已注销</span>
+    </div>
+    <div class="demo-note">注意：status-dot/dot-* 的 CSS 在各页内联 style 里定义，不在 proto-base.css 中。复制时需带上。</div>
+  </div>
+</div>
+
+<!-- ============ 指标卡 ============ -->
+<div class="demo-section">
+  <h2>指标卡（看板用）</h2>
+  <div class="demo-cls">.metrics-row > .m-card > .m-icon + .m-info(.m-num + .m-label)</div>
+  <div class="demo-frame">
+    <div class="metrics-row" style="margin-bottom:0;">
+      <div class="m-card">
+        <div class="m-icon blue"><i class="fas fa-database"></i></div>
+        <div class="m-info"><div class="m-num">128</div><div class="m-label">服务总数</div></div>
+      </div>
+      <div class="m-card">
+        <div class="m-icon green"><i class="fas fa-check-circle"></i></div>
+        <div class="m-info"><div class="m-num">98.6%</div><div class="m-label">成功率</div></div>
+      </div>
+      <div class="m-icon orange" style="width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;"><i class="fas fa-clock"></i></div>
+      <div class="m-card">
+        <div class="m-icon blue"><i class="fas fa-exclamation-triangle" style="color:var(--error);"></i></div>
+        <div class="m-info"><div class="m-num" style="color:var(--error);">2</div><div class="m-label">异常服务</div></div>
+      </div>
+    </div>
+    <div class="demo-note">m-icon 四色：blue/green/purple/orange，对应不同指标语义。metrics-row 自动四等分。</div>
+  </div>
+</div>
+
+<!-- ============ 详情字段网格 ============ -->
+<div class="demo-section">
+  <h2>详情字段网格（只读）</h2>
+  <div class="demo-cls">.info-grid > .info-item(.info-label + .info-value)</div>
+  <div class="demo-frame">
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">服务名称</div><div class="info-value">企业碳排数据查询API</div></div>
+      <div class="info-item"><div class="info-label">编码</div><div class="info-value">SVC-A-001</div></div>
+      <div class="info-item"><div class="info-label">状态</div><div class="info-value"><span class="tag tag-green">已通过</span></div></div>
+      <div class="info-item"><div class="info-label">负责人</div><div class="info-value">张三</div></div>
+      <div class="info-item full"><div class="info-label">描述</div><div class="info-value">这是一个示例服务，用于演示详情字段网格的展示效果。.full 类跨两列。</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 状态条（详情页头部） ============ -->
+<div class="demo-section">
+  <h2>状态条（详情页头部）</h2>
+  <div class="demo-cls">.status-bar > .sb-left(.sb-title + .sb-meta) + 右侧操作</div>
+  <div class="demo-frame">
+    <div class="status-bar" style="margin-bottom:0;">
+      <div class="sb-left">
+        <span class="sb-title">CU-2024-001 股票交易清算单元A</span>
+        <span class="sb-meta"><span class="tag tag-green">启用</span><span>创建于 2024-01-01</span></span>
+      </div>
+      <div><button class="action-link" style="font-size:13px;">编辑</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 概览卡（详情页） ============ -->
+<div class="demo-section">
+  <h2>概览卡（详情页顶部信息）</h2>
+  <div class="demo-cls">.overview-card > .ov-head(.ov-title + 操作) + .ov-tags + .ov-desc + .ov-meta</div>
+  <div class="demo-frame">
+    <div class="overview-card" style="margin-bottom:0;">
+      <div class="ov-head">
+        <div>
+          <div class="ov-title">企业碳排数据查询API <span class="tag tag-blue">API接口</span></div>
+          <div class="ov-tags"><span class="tag tag-green">已通过</span><span class="tag tag-gray">v2.0</span></div>
+        </div>
+      </div>
+      <div class="ov-desc">提供企业碳排放数据的查询能力，支持按企业名称、统一社会信用代码等条件检索。</div>
+      <div class="ov-meta">
+        <span><i class="fas fa-user"></i>张三</span>
+        <span><i class="fas fa-calendar"></i>2026-07-06</span>
+        <span><i class="fas fa-code"></i>SVC-A-001</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Tabs ============ -->
+<div class="demo-section">
+  <h2>Tabs 标签页</h2>
+  <div class="demo-cls">.tabs > .tab-item(.active)</div>
+  <div class="demo-frame">
+    <div class="tabs">
+      <div class="tab-item active">变更记录</div>
+      <div class="tab-item">关联资源</div>
+      <div class="tab-item">操作日志</div>
+    </div>
+    <div style="padding:16px 0;font-size:13px;color:var(--slate-500);">当前 Tab 内容区...</div>
+  </div>
+  <div class="demo-note">active 类标记当前选中。内容切换用 JS toggle active 和对应面板的 display。</div>
+</div>
+
+<!-- ============ 时间线 ============ -->
+<div class="demo-section">
+  <h2>时间线（操作日志）</h2>
+  <div class="demo-cls">.timeline > .tl-item(.tl-dot + .tl-head(.tl-name + .tl-time) + .tl-desc)</div>
+  <div class="demo-frame">
+    <div class="timeline" style="padding-left:24px;">
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--success);"></div>
+        <div class="tl-head"><span class="tl-name">审批通过</span><span class="tl-time">2026-07-08 10:30</span></div>
+        <div class="tl-desc">管理员审批通过，已配置凭证</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--brand);"></div>
+        <div class="tl-head"><span class="tl-name">提交申请</span><span class="tl-time">2026-07-08 09:20</span></div>
+        <div class="tl-desc">开发者提交服务调用申请</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="background:var(--slate-300);"></div>
+        <div class="tl-head"><span class="tl-name">创建应用</span><span class="tl-time">2026-07-06 14:00</span></div>
+        <div class="tl-desc">开发者注册应用</div>
+      </div>
+    </div>
+  </div>
+  <div class="demo-note">tl-dot 颜色按操作语义：绿=成功/完成，蓝=主操作，灰=历史记录。竖线由 .timeline::before 自动绘制。</div>
+</div>
+
+<!-- ============ 进度条 ============ -->
+<div class="demo-section">
+  <h2>进度条</h2>
+  <div class="demo-cls">.progress-wrap > .progress-bar > .progress-fill + .progress-num</div>
+  <div class="demo-frame">
+    <div class="progress-wrap" style="margin-bottom:0;">
+      <div class="progress-bar"><div class="progress-fill" style="width:70%;"></div></div>
+      <div class="progress-num">70%</div>
+    </div>
+    <div class="progress-stages" style="margin-top:4px;">
+      <span class="stage done">创建</span>
+      <span class="stage done">审核</span>
+      <span class="stage">执行中</span>
+      <span>完成</span>
+    </div>
+  </div>
+  <div class="demo-note">progress-fill 宽度用 inline style 设百分比。progress-stages 的 .done 标记已完成阶段。</div>
+</div>
+
+<!-- ============ 双列布局 ============ -->
+<div class="demo-section">
+  <h2>双列布局</h2>
+  <div class="demo-cls">.two-col</div>
+  <div class="demo-frame">
+    <div class="two-col">
+      <div class="card" style="padding:16px;"><div class="card-title" style="border:none;padding:0;margin:0;">左列</div></div>
+      <div class="card" style="padding:16px;"><div class="card-title" style="border:none;padding:0;margin:0;">右列</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 空状态 ============ -->
+<div class="demo-section">
+  <h2>空状态</h2>
+  <div class="demo-cls">.empty-state</div>
+  <div class="demo-frame">
+    <div class="empty-state">
+      <i class="fas fa-inbox"></i>
+      暂无数据
+    </div>
+  </div>
+</div>
+
+<!-- ============ 确认卡片（双方签订） ============ -->
+<div class="demo-section">
+  <h2>确认卡片（双方状态）</h2>
+  <div class="demo-cls">.confirm-grid > .confirm-card(.me) > .confirm-head(.confirm-role + .confirm-status) + .confirm-org + .confirm-time</div>
+  <div class="demo-frame">
+    <div class="confirm-grid">
+      <div class="confirm-card me">
+        <div class="confirm-head"><span class="confirm-role">我方</span><span class="confirm-status done">已确认</span></div>
+        <div class="confirm-org">XX数据运营中心</div>
+        <div class="confirm-time">2026-07-08 10:30</div>
+      </div>
+      <div class="confirm-card">
+        <div class="confirm-head"><span class="confirm-role">对方</span><span class="confirm-status wait">待确认</span></div>
+        <div class="confirm-org">XX智慧城市运营</div>
+        <div class="confirm-time">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="demo-note">.me 类标记我方（主色边框+浅底）。confirm-status 的 .done 绿色、.wait 灰色。</div>
+</div>
+
+<!-- ============ 存证盒 ============ -->
+<div class="demo-section">
+  <h2>存证盒</h2>
+  <div class="demo-cls">.evidence-box > .ev-icon + .ev-info(.ev-title + .ev-hash)</div>
+  <div class="demo-frame">
+    <div class="evidence-box">
+      <div class="ev-icon"><i class="fas fa-shield-alt"></i></div>
+      <div class="ev-info">
+        <div class="ev-title">区块链存证</div>
+        <div class="ev-hash">0x8f3a...c2b1</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 底部固定操作区 ============ -->
+<div class="demo-section">
+  <h2>底部固定操作区</h2>
+  <div class="demo-cls">.sticky-actions</div>
+  <div class="demo-frame">
+    <div style="position:relative;height:60px;">
+      <div class="sticky-actions" style="position:relative;bottom:auto;">
+        <button class="action-link" style="font-size:13px;padding:4px 12px;border:1px solid var(--slate-300);border-radius:4px;background:#fff;">取消</button>
+        <button class="action-link" style="font-size:13px;padding:4px 12px;border:none;border-radius:4px;background:var(--brand);color:#fff;">保存</button>
+      </div>
+    </div>
+  </div>
+  <div class="demo-note">在详情页内容底部 sticky 固定，防止内容过长时操作按钮滚出视口。</div>
+</div>
+
+</body>
+</html>
