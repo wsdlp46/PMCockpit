@@ -36,13 +36,13 @@ for f in "$CSS_FILE" "$SIDEBAR_FILE" "$JS_FILE"; do
   fi
 done
 
-# 选择要构建的源文件（兼容 macOS bash 3.x，不用 mapfile）
+# 选择要构建的源文件。使用 NUL 分隔，避免中文、空格或括号路径被 shell 拆开。
+# 兼容 macOS bash 3.x，不使用 mapfile 或 sort -z。
 FILTER="${1:-}"
-if [[ -n "$FILTER" ]]; then
-  SRC_FILES=( $(find "$PROJECT_DIR" -maxdepth 1 -name "${FILTER}*.src.html" | sort) )
-else
-  SRC_FILES=( $(find "$PROJECT_DIR" -maxdepth 1 -name "*.src.html" | sort) )
-fi
+SRC_FILES=()
+while IFS= read -r -d '' src_file; do
+  SRC_FILES+=("$src_file")
+done < <(find "$PROJECT_DIR" -maxdepth 1 -type f -name "${FILTER}*.src.html" -print0)
 
 if [[ ${#SRC_FILES[@]} -eq 0 ]]; then
   echo "⚠️  未找到 .src.html 源文件。"

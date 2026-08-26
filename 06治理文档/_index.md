@@ -18,10 +18,13 @@
 | _待填充_（资产盘点类，重大资产变动后重新盘点） | 资产盘点：识别哪些资产可对外、需脱敏、不可对外 |
 | _待填充_（审计类，按周期归档） | 智能体内容审计：检查工作区文档质量、过期内容 |
 | _待填充_（巡检报告） | 结构合规、索引真实性、断链巡检 |
+| [治理巡检清单.md](治理巡检清单.md) | 跨工具 Skill、Agent、MCP 与索引的定期和触发式巡检规则 |
 
 ## 工具
 
 - `scripts/check-workspace-links.mjs` — 全工作区内部链接检查（node 运行，自动跳过 .git / node_modules 等目录）
+- `scripts/harness-audit.sh` — 核心 8 Skill、可选测试/VitePress、四端软链与 ZCode Agent 的只读巡检
+- `scripts/route-regression.sh` — 核心路由静态回归；启用 VitePress 时可追加 `--with-vitepress`
 
 ## 维护规则
 

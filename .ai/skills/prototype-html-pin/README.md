@@ -16,9 +16,7 @@
 
 ## 输入
 
-可直接用自然语言描述需求，也可配合 [proto-spec-generator](https://github.com/wsdlp46/proto-spec-generator) 产出的标准化规格文档生成更严谨的原型。
-
-> 完整产品工作流建议搭配 [pm-assistant-lrw](https://github.com/wsdlp46/pm-assistant-lrw) Expert，一站式覆盖 PRD → 方案 → 规格 → 原型。
+可直接用自然语言描述需求；在 PMCockpit 中，建议先使用 `proto-spec-generator` 生成并确认页面规格，再生成原型。
 
 ## 新增能力
 
@@ -37,17 +35,14 @@
 
 ## 安装
 
-复制到 AI 工具的 skills 目录：
+在 PMCockpit 仓库根目录执行统一安装脚本：
 
 ```bash
-# 推荐：使用仓库根目录安装脚本（自动创建软链接）
-cd ~/Skills && bash install.sh
-
-# 或使用统一安装脚本（推荐，自动适配 ZCode/Claude/Codex）
+# 自动适配 ZCode、WorkBuddy、Claude Code 和 Codex
 bash .ai/install.sh
 ```
 
-适用于任何支持 Skill 机制的 AI 工具（如 CodeBuddy、WorkBuddy、Cursor 等）。
+具体支持的工具和调用方式见仓库根目录 `.ai/TOOL-MAPPING.md`。
 
 ## 目录结构
 
@@ -57,7 +52,9 @@ prototype-html-pin/
 ├── README.md                 # 本文件（给人读）
 └── assets/
     ├── annotation-demo.html  # Pin 标注方案完整演示
-    └── example.html          # 参考布局示例
+    ├── design/               # 门户与移动端视觉基线、脱敏示例
+    ├── scaffold/             # 管理后台源页面与单文件构建脚手架
+    └── workflows/            # 交付检查、迭代和 Pin 标注说明
 ```
 
 ## 许可

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>今日巡检任务</title>
+  <!-- SCAFFOLD:CSS -->
+</head>
+<body>
+  <main class="page-shell">
+    <section class="content-card">
+      <div class="page-heading">
+        <div>
+          <h1>巡检任务</h1>
+          <p>展示当天需处理的巡检事项</p>
+        </div>
+        <span class="count" id="task-count">3 项任务</span>
+      </div>
+      <div class="filter-row" aria-label="任务状态筛选">
+        <button class="filter active" data-status="all">全部</button>
+        <button class="filter" data-status="pending">待巡检</button>
+        <button class="filter" data-status="done">已完成</button>
+      </div>
+      <table>
+        <thead><tr><th>任务名称</th><th>巡检区域</th><th>计划完成时间</th><th>负责人</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody id="task-table">
+          <tr data-status="pending"><td>消防通道检查</td><td>A 区 1 号楼</td><td>10:00</td><td>张晨</td><td><span class="tag pending">待巡检</span></td><td><button class="complete">标记完成</button></td></tr>
+          <tr data-status="pending"><td>配电房巡查</td><td>B 区配电房</td><td>14:00</td><td>李晴</td><td><span class="tag pending">待巡检</span></td><td><button class="complete">标记完成</button></td></tr>
+          <tr data-status="done"><td>园区照明检查</td><td>主园路</td><td>09:00</td><td>王宁</td><td><span class="tag done">已完成</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+      <p class="empty" id="empty-state" hidden>暂无符合条件的巡检任务</p>
+    </section>
+  </main>
+  <!-- SCAFFOLD:SIDEBAR -->
+  <!-- SCAFFOLD:JS -->
+</body>
+</html>

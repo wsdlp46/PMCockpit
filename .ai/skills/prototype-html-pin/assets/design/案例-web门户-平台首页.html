@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PH1 平台首页 — 数据空间平台平台</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root {
+    --brand: #0369A1;
+    --brand-light: #0284C7;
+    --dark-navy: #0F172A;
+    --slate-50: #F8FAFC;
+    --slate-100: #F1F5F9;
+    --slate-200: #E2E8F0;
+    --slate-300: #CBD5E1;
+    --slate-400: #94A3B8;
+    --slate-500: #64748B;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1E293B;
+    --amber-bg: #FFFBEB;
+    --amber-border: #fde68a;
+    --amber-accent: #D97706;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #F8FAFC;
+    overflow-x: hidden;
+  }
+  /* Layout */
+  .app-container {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+  }
+  .main-content {
+    width: 78%;
+    min-height: 100vh;
+    background: #fff;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .doc-panel {
+    width: 22%;
+    min-height: 100vh;
+    background: var(--amber-bg);
+    border-left: 2px solid var(--amber-border);
+    padding: 32px 24px;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .doc-panel h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--slate-800);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--amber-border);
+  }
+  .doc-section {
+    margin-bottom: 24px;
+    padding: 14px 16px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--amber-border);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--slate-600);
+    position: relative;
+  }
+  .doc-section .doc-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--amber-accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+  .doc-section h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--slate-700);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+  }
+  .doc-section p { margin: 0; }
+  .doc-section ul { margin: 6px 0 0 14px; padding: 0; }
+  .doc-section ul li { margin-bottom: 3px; }
+  /* SVG connection lines */
+  .svg-lines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 50;
+  }
+  .svg-lines path {
+    stroke: var(--amber-accent);
+    stroke-width: 2;
+    fill: none;
+    opacity: 0.5;
+    transition: opacity 0.3s, stroke-width 0.3s;
+  }
+  .svg-lines circle {
+    fill: var(--amber-accent);
+    opacity: 0.8;
+  }
+  .connect-point {
+    position: relative;
+  }
+  /* Top Nav */
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 60px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .top-nav .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .top-nav .logo i { color: var(--brand-light); font-size: 24px; }
+  .nav-menu {
+    display: flex;
+    gap: 0;
+    list-style: none;
+  }
+  .nav-menu li a {
+    display: block;
+    padding: 18px 20px;
+    color: var(--slate-400);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+  .nav-menu li a:hover,
+  .nav-menu li a.active {
+    color: #fff;
+    border-bottom-color: var(--brand-light);
+  }
+  .nav-menu li a.active { font-weight: 600; }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .btn-login {
+    padding: 7px 20px;
+    border-radius: 6px;
+    border: 1px solid var(--slate-500);
+    background: transparent;
+    color: var(--slate-300);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-login:hover { border-color: #fff; color: #fff; }
+  .btn-register {
+    padding: 7px 20px;
+    border-radius: 6px;
+    border: none;
+    background: var(--brand-light);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-register:hover { background: var(--brand); }
+  /* Banner */
+  .hero-banner {
+    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 40%, #0F172A 100%);
+    padding: 80px 60px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(2,132,199,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-banner::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(2,132,199,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 1px;
+  }
+  .hero-subtitle {
+    font-size: 17px;
+    color: var(--slate-400);
+    margin-bottom: 36px;
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+  .hero-btns {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+  .btn-hero-primary {
+    padding: 14px 40px;
+    border-radius: 8px;
+    border: none;
+    background: var(--brand-light);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(2,132,199,0.3);
+  }
+  .btn-hero-primary:hover { background: var(--brand); transform: translateY(-1px); }
+  .btn-hero-secondary {
+    padding: 14px 40px;
+    border-radius: 8px;
+    border: 1px solid var(--slate-500);
+    background: transparent;
+    color: var(--slate-300);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-hero-secondary:hover { border-color: #fff; color: #fff; }
+  /* Section */
+  .section {
+    padding: 56px 60px;
+  }
+  .section-alt { background: var(--slate-50); }
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+  .section-header h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--slate-800);
+  }
+  .section-header .subtitle {
+    font-size: 13px;
+    color: var(--slate-400);
+    margin-top: 4px;
+  }
+  .section-header .view-all {
+    color: var(--brand-light);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .section-header .view-all:hover { color: var(--brand); }
+  /* Metrics Bar */
+  .metrics-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 60px;
+    position: relative;
+    margin-top: -40px;
+    z-index: 10;
+  }
+  .metric-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px 40px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(15,23,42,0.06);
+    border: 1px solid var(--slate-200);
+    flex: 1;
+    max-width: 240px;
+    transition: all 0.3s;
+  }
+  .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(15,23,42,0.1); }
+  .metric-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--slate-800);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .metric-label {
+    font-size: 14px;
+    color: var(--slate-500);
+    font-weight: 500;
+  }
+  /* Cards */
+  .card-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .card-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .space-card {
+    background: #fff;
+    border: 1px solid var(--slate-200);
+    border-radius: 12px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .space-card:hover {
+    border-color: var(--brand-light);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(2,132,199,0.08);
+  }
+  .space-card .card-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--slate-800);
+    margin-bottom: 8px;
+  }
+  .space-card .card-desc {
+    font-size: 13px;
+    color: var(--slate-500);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .space-card .card-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .card-tag {
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .tag-business { background: #DBEAFE; color: #1E40AF; }
+  .tag-finance { background: #DCFCE7; color: #166534; }
+  .tag-traffic { background: #FEF3C7; color: #92400E; }
+  .tag-medical { background: #FCE7F3; color: #9D174D; }
+  .tag-env { background: #D1FAE5; color: #065F46; }
+  .tag-agri { background: #FEF9C3; color: #854D0E; }
+  .tag-edu { background: #E0E7FF; color: #3730A3; }
+  .tag-tech { background: #F3E8FF; color: #6B21A8; }
+  .card-stats {
+    display: flex;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--slate-100);
+  }
+  .card-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--slate-500);
+  }
+  .card-stat-item i { color: var(--slate-400); font-size: 12px; }
+  .card-stat-item strong { color: var(--slate-700); }
+  /* Product Card */
+  .product-card {
+    background: #fff;
+    border: 1px solid var(--slate-200);
+    border-radius: 12px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .product-card:hover {
+    border-color: var(--brand-light);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(2,132,199,0.08);
+  }
+  .product-card .card-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--slate-800);
+    margin-bottom: 6px;
+  }
+  .product-card .card-provider {
+    font-size: 12px;
+    color: var(--slate-400);
+    margin-bottom: 12px;
+  }
+  .product-card .card-desc {
+    font-size: 13px;
+    color: var(--slate-500);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .product-card .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--slate-100);
+  }
+  .format-badge {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--slate-100);
+    color: var(--slate-600);
+  }
+  .btn-apply-sm {
+    padding: 5px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--brand-light);
+    background: transparent;
+    color: var(--brand-light);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-apply-sm:hover { background: var(--brand-light); color: #fff; }
+  /* Resource Table */
+  .resource-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .resource-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--slate-600);
+    background: var(--slate-50);
+    border-bottom: 1px solid var(--slate-200);
+  }
+  .resource-table td {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--slate-700);
+    border-bottom: 1px solid var(--slate-100);
+  }
+  .resource-table tbody tr {
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .resource-table tbody tr:hover { background: var(--slate-50); }
+  .resource-table tbody tr:nth-child(even) { background: var(--slate-50); }
+  .resource-table tbody tr:nth-child(even):hover { background: #E2E8F0; }
+  /* Dual column */
+  .dual-col {
+    display: flex;
+    gap: 40px;
+  }
+  .dual-col-left { flex: 1; }
+  .dual-col-right { flex: 1; }
+  .org-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .org-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 16px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid var(--slate-200);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .org-card:hover {
+    border-color: var(--brand-light);
+    transform: translateY(-2px);
+  }
+  .org-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #fff;
+  }
+  .org-icon-1 { background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
+  .org-icon-2 { background: linear-gradient(135deg, #10B981, #047857); }
+  .org-icon-3 { background: linear-gradient(135deg, #F59E0B, #D97706); }
+  .org-icon-4 { background: linear-gradient(135deg, #EC4899, #BE185D); }
+  .org-icon-5 { background: linear-gradient(135deg, #8B5CF6, #5B21B6); }
+  .org-icon-6 { background: linear-gradient(135deg, #06B6D4, #0E7490); }
+  .org-icon-7 { background: linear-gradient(135deg, #F97316, #C2410C); }
+  .org-icon-8 { background: linear-gradient(135deg, #6366F1, #3730A3); }
+  .org-name { font-size: 13px; font-weight: 500; color: var(--slate-700); text-align: center; }
+  /* News List */
+  .news-list {
+    list-style: none;
+  }
+  .news-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--slate-100);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+  }
+  .news-item:hover { background: var(--slate-50); padding-left: 8px; margin-left: -8px; border-radius: 4px; }
+  .news-title {
+    font-size: 14px;
+    color: var(--slate-700);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .news-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .news-date { font-size: 12px; color: var(--slate-400); }
+  /* Footer */
+  .site-footer {
+    background: var(--dark-navy);
+    padding: 40px 60px 24px;
+    color: var(--slate-400);
+  }
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 20px;
+  }
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .footer-links {
+    display: flex;
+    gap: 28px;
+  }
+  .footer-links a {
+    color: var(--slate-400);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: #fff; }
+  .footer-bottom {
+    text-align: center;
+    font-size: 12px;
+    color: var(--slate-500);
+  }
+  /* Skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, #E2E8F0 25%, #F1F5F9 50%, #E2E8F0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  /* Responsive */
+  @media (max-width: 1280px) {
+    .doc-panel { display: none; }
+    .main-content { width: 100%; }
+    .svg-lines { display: none; }
+    .card-grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .org-grid { grid-template-columns: repeat(4, 1fr); }
+    .section { padding: 40px 24px; }
+    .metrics-bar { padding: 0 24px; }
+    .hero-banner { padding: 60px 24px; }
+    .hero-title { font-size: 32px; }
+    .dual-col { flex-direction: column; }
+  }
+  @media (max-width: 768px) {
+    .top-nav { padding: 0 16px; }
+    .nav-menu { display: none; }
+    .card-grid-4 { grid-template-columns: 1fr; }
+    .org-grid { grid-template-columns: repeat(2, 1fr); }
+    .metrics-bar { flex-wrap: wrap; gap: 12px; margin-top: -24px; padding: 0 16px; }
+    .metric-card { max-width: none; flex: 1 1 45%; padding: 16px; }
+    .metric-value { font-size: 28px; }
+    .section { padding: 32px 16px; }
+    .hero-title { font-size: 26px; }
+    .hero-btns { flex-direction: column; align-items: center; }
+  }
+  .highlight-box {
+    animation: highlightPulse 2s ease-in-out infinite;
+  }
+  @keyframes highlightPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(2,132,199,0.3); }
+    50% { box-shadow: 0 0 0 6px rgba(2,132,199,0); }
+  }
+</style>
+</head>
+<body>
+<div class="app-container">
+  <!-- ===================== LEFT: Product UI (78%) ===================== -->
+  <div class="main-content" id="mainContent">
+
+    <!-- 1. Top Navigation -->
+    <nav class="top-nav" id="topNav">
+      <a href="#" class="logo"><i class="fa-solid fa-cubes"></i>数据空间平台平台</a>
+      <ul class="nav-menu">
+        <li><a href="#" class="active">首页</a></li>
+        <li><a href="PH2-S1-空间列表页.html">数据空间</a></li>
+        <li><a href="PH3-S1-资源列表页.html">数据资源</a></li>
+        <li><a href="PH4-S1-产品列表页.html">数据产品</a></li>
+        <li><a href="PH5-S1-机构名录页.html">合作生态</a></li>
+        <li><a href="PH7-S1-需求列表页.html">需求大厅</a></li>
+        <li><a href="PH6-S1-资讯列表页.html">资讯动态</a></li>
+      </ul>
+      <div class="nav-right">
+        <button class="btn-login" onclick="alert('跳转至登录页')">登录</button>
+        <button class="btn-register" onclick="alert('跳转至注册页')">注册</button>
+      </div>
+    </nav>
+
+    <!-- 2. Hero Banner -->
+    <section class="hero-banner connect-point" id="heroBanner">
+      <h1 class="hero-title">数据空间平台平台</h1>
+      <p class="hero-subtitle">安全可信的数据流通基础设施，实现跨机构数据的合规共享与协同计算</p>
+      <div class="hero-btns">
+        <button class="btn-hero-primary" onclick="alert('入驻申请流程')">立即入驻</button>
+        <button class="btn-hero-secondary" onclick="document.getElementById('spacesSection').scrollIntoView({behavior:'smooth'})">了解更多</button>
+      </div>
+    </section>
+
+    <!-- 3. Core Metrics -->
+    <div class="metrics-bar connect-point" id="metricsBar">
+      <div class="metric-card metric-1">
+        <div class="metric-value">1,247</div>
+        <div class="metric-label">入驻机构</div>
+      </div>
+      <div class="metric-card metric-2">
+        <div class="metric-value">86</div>
+        <div class="metric-label">数据空间</div>
+      </div>
+      <div class="metric-card metric-3">
+        <div class="metric-value">3,529</div>
+        <div class="metric-label">数据产品</div>
+      </div>
+      <div class="metric-card metric-4">
+        <div class="metric-value">128,650</div>
+        <div class="metric-label">合约履约</div>
+      </div>
+    </div>
+
+    <!-- 4. Data Spaces -->
+    <section class="section section-alt connect-point" id="spacesSection">
+      <div class="section-header">
+        <div>
+          <h3>数据空间</h3>
+          <p class="subtitle">发现协作空间，开启跨机构数据协同</p>
+        </div>
+        <a href="PH2-S1-空间列表页.html" class="view-all">查看全部 <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="card-grid-4">
+        <div class="space-card" onclick="location.href='PH2-S2-空间详情页.html'">
+          <div class="card-tags"><span class="card-tag tag-finance">金融</span></div>
+          <div class="card-name">普惠金融联合计算空间</div>
+          <div class="card-desc">面向金融机构提供多方安全计算能力，实现跨银行联合风控与精准营销建模</div>
+          <div class="card-stats">
+            <span class="card-stat-item"><i class="fa-solid fa-building"></i><strong>12</strong> 成员</span>
+            <span class="card-stat-item"><i class="fa-solid fa-box"></i><strong>86</strong> 产品</span>
+          </div>
+        </div>
+        <div class="space-card" onclick="location.href='PH2-S2-空间详情页.html'">
+          <div class="card-tags"><span class="card-tag tag-traffic">交通</span></div>
+          <div class="card-name">智慧交通数据协作空间</div>
+          <div class="card-desc">汇聚交通出行、路网运行和企业运营数据，支撑城市交通治理与优化</div>
+          <div class="card-stats">
+            <span class="card-stat-item"><i class="fa-solid fa-building"></i><strong>8</strong> 成员</span>
+            <span class="card-stat-item"><i class="fa-solid fa-box"></i><strong>42</strong> 产品</span>
+          </div>
+        </div>
+        <div class="space-card" onclick="location.href='PH2-S2-空间详情页.html'">
+          <div class="card-tags"><span class="card-tag tag-medical">医疗</span></div>
+          <div class="card-name">医疗健康数据共享空间</div>
+          <div class="card-desc">连接医疗机构与科研单位，在隐私保护前提下实现临床数据的可信共享与分析</div>
+          <div class="card-stats">
+            <span class="card-stat-item"><i class="fa-solid fa-building"></i><strong>15</strong> 成员</span>
+            <span class="card-stat-item"><i class="fa-solid fa-box"></i><strong>103</strong> 产品</span>
+          </div>
+        </div>
+        <div class="space-card" onclick="location.href='PH2-S2-空间详情页.html'">
+          <div class="card-tags"><span class="card-tag tag-env">环保</span></div>
+          <div class="card-name">绿色低碳数据协作空间</div>
+          <div class="card-desc">整合碳排放监测、环境治理与能源消耗数据，服务低碳发展与绿色发展</div>
+          <div class="card-stats">
+            <span class="card-stat-item"><i class="fa-solid fa-building"></i><strong>6</strong> 成员</span>
+            <span class="card-stat-item"><i class="fa-solid fa-box"></i><strong>29</strong> 产品</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Hot Products -->
+    <section class="section connect-point" id="productsSection">
+      <div class="section-header">
+        <div>
+          <h3>热门数据产品</h3>
+          <p class="subtitle">精选高质量数据产品，驱动业务决策与创新</p>
+        </div>
+        <a href="#" class="view-all">查看全部 <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="card-grid-4">
+        <div class="product-card">
+          <div class="card-tags"><span class="card-tag tag-finance">金融</span></div>
+          <div class="card-name">企业信贷风险评估模型</div>
+          <div class="card-provider">中国人民银行某市中心支行</div>
+          <div class="card-desc">基于多方数据联合建模的企业贷款违约概率预测，覆盖500万+企业主体</div>
+          <div class="card-bottom">
+            <span class="format-badge">API</span>
+            <button class="btn-apply-sm"><i class="fa-solid fa-paper-plane"></i> 申请使用</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="card-tags"><span class="card-tag tag-traffic">交通</span></div>
+          <div class="card-name">城市交通拥堵指数数据集</div>
+          <div class="card-provider">XX市交通运输局</div>
+          <div class="card-desc">全市主要道路实时及历史拥堵指数，覆盖早中晚高峰时段，分钟级更新</div>
+          <div class="card-bottom">
+            <span class="format-badge">CSV</span>
+            <button class="btn-apply-sm"><i class="fa-solid fa-paper-plane"></i> 申请使用</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="card-tags"><span class="card-tag tag-medical">医疗</span></div>
+          <div class="card-name">区域居民健康画像数据</div>
+          <div class="card-provider">XX市卫生健康委员会</div>
+          <div class="card-desc">基于区域医疗大数据的居民健康风险评估与疾病预测分析数据集</div>
+          <div class="card-bottom">
+            <span class="format-badge">数据库表</span>
+            <button class="btn-apply-sm"><i class="fa-solid fa-paper-plane"></i> 申请使用</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="card-tags"><span class="card-tag tag-env">环保</span></div>
+          <div class="card-name">区域碳排放实时监测数据</div>
+          <div class="card-provider">XX市生态环境局</div>
+          <div class="card-desc">覆盖全市重点排放单位的碳排放实时监测数据，支持小时级粒度查询</div>
+          <div class="card-bottom">
+            <span class="format-badge">API</span>
+            <button class="btn-apply-sm"><i class="fa-solid fa-paper-plane"></i> 申请使用</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Latest Resources -->
+    <section class="section section-alt connect-point" id="resourcesSection">
+      <div class="section-header">
+        <div>
+          <h3>最新数据资源</h3>
+          <p class="subtitle">实时追踪平台最新上架的数据资源</p>
+        </div>
+        <a href="#" class="view-all">查看全部 <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <table class="resource-table">
+        <thead>
+          <tr>
+            <th>资源名称</th>
+            <th>提供方</th>
+            <th>行业分类</th>
+            <th>上架时间</th>
+            <th>数据格式</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2026年Q1企业纳税信用等级数据</td>
+            <td>XX市税务局</td>
+            <td><span class="card-tag tag-finance">金融</span></td>
+            <td>2026-06-08</td>
+            <td><span class="format-badge">CSV</span></td>
+          </tr>
+          <tr>
+            <td>城市公共交通客流OD矩阵</td>
+            <td>XX市交通运输局</td>
+            <td><span class="card-tag tag-traffic">交通</span></td>
+            <td>2026-06-07</td>
+            <td><span class="format-badge">数据库表</span></td>
+          </tr>
+          <tr>
+            <td>全市基层医疗机构药品使用统计</td>
+            <td>XX市卫健委</td>
+            <td><span class="card-tag tag-medical">医疗</span></td>
+            <td>2026-06-05</td>
+            <td><span class="format-badge">API</span></td>
+          </tr>
+          <tr>
+            <td>重点流域水质监测年报（2025）</td>
+            <td>XX市生态环境局</td>
+            <td><span class="card-tag tag-env">环保</span></td>
+            <td>2026-06-03</td>
+            <td><span class="format-badge">CSV</span></td>
+          </tr>
+          <tr>
+            <td>全市中小学教育资源配置一览表</td>
+            <td>XX市教育局</td>
+            <td><span class="card-tag tag-edu">教育</span></td>
+            <td>2026-06-01</td>
+            <td><span class="format-badge">数据库表</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 7. Ecosystem + News Dual Column -->
+    <section class="section" id="ecosystemSection">
+      <div class="dual-col">
+        <!-- Left: Ecosystem -->
+        <div class="dual-col-left connect-point" id="ecosystemCol">
+          <div class="section-header">
+            <div>
+              <h3>合作生态</h3>
+              <p class="subtitle">汇聚城市数据力量，共建可信数据流通生态</p>
+            </div>
+            <a href="#" class="view-all">查看全部 <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+          <div class="org-grid">
+            <div class="org-card"><div class="org-icon org-icon-1"><i class="fa-solid fa-landmark"></i></div><span class="org-name">XX市大数据管理局</span></div>
+            <div class="org-card"><div class="org-icon org-icon-2"><i class="fa-solid fa-hospital"></i></div><span class="org-name">XX市卫生健康委员会</span></div>
+            <div class="org-card"><div class="org-icon org-icon-3"><i class="fa-solid fa-bus"></i></div><span class="org-name">XX市交通运输局</span></div>
+            <div class="org-card"><div class="org-icon org-icon-4"><i class="fa-solid fa-leaf"></i></div><span class="org-name">XX市生态环境局</span></div>
+            <div class="org-card"><div class="org-icon org-icon-5"><i class="fa-solid fa-graduation-cap"></i></div><span class="org-name">XX市教育局</span></div>
+            <div class="org-card"><div class="org-icon org-icon-6"><i class="fa-solid fa-building-columns"></i></div><span class="org-name">中国人民银行XX支行</span></div>
+            <div class="org-card"><div class="org-icon org-icon-7"><i class="fa-solid fa-microchip"></i></div><span class="org-name">XX市工业与信息化局</span></div>
+            <div class="org-card"><div class="org-icon org-icon-8"><i class="fa-solid fa-city"></i></div><span class="org-name">XX市住房与城乡建设局</span></div>
+          </div>
+        </div>
+        <!-- Right: News -->
+        <div class="dual-col-right connect-point" id="newsCol">
+          <div class="section-header">
+            <div>
+              <h3>资讯动态</h3>
+            </div>
+            <a href="#" class="view-all">更多 <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+          <ul class="news-list">
+            <li class="news-item">
+              <span class="news-title">关于发布《数据空间平台平台运营管理办法》的通知</span>
+              <span class="news-meta"><span class="card-tag tag-business">平台公告</span><span class="news-date">06-09</span></span>
+            </li>
+            <li class="news-item">
+              <span class="news-title">国家数据局印发《数据空间平台发展行动计划（2026-2028）》</span>
+              <span class="news-meta"><span class="card-tag tag-tech">行业政策</span><span class="news-date">06-07</span></span>
+            </li>
+            <li class="news-item">
+              <span class="news-title">普惠金融联合计算空间接入10家新机构，数据产品突破80项</span>
+              <span class="news-meta"><span class="card-tag tag-finance">技术案例</span><span class="news-date">06-05</span></span>
+            </li>
+            <li class="news-item">
+              <span class="news-title">市大数据管理局联合多部门启动"城市数据要素×"专项行动</span>
+              <span class="news-meta"><span class="card-tag tag-business">平台公告</span><span class="news-date">06-03</span></span>
+            </li>
+            <li class="news-item">
+              <span class="news-title">隐私计算TEE联邦学习在医疗数据共享场景的实践应用</span>
+              <span class="news-meta"><span class="card-tag tag-medical">技术案例</span><span class="news-date">06-01</span></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Footer -->
+    <footer class="site-footer" id="siteFooter">
+      <div class="footer-top">
+        <div class="footer-logo"><i class="fa-solid fa-cubes"></i>数据空间平台平台</div>
+        <div class="footer-links">
+          <a href="#">关于平台</a>
+          <a href="#">服务协议</a>
+          <a href="#">隐私政策</a>
+          <a href="#">联系我们</a>
+        </div>
+      </div>
+      <div class="footer-bottom">Copyright © 2026 数据空间平台平台平台 &nbsp;|&nbsp; ICP备XXXXXXXX号</div>
+    </footer>
+  </div>
+
+  <!-- ===================== RIGHT: Documentation (22%) ===================== -->
+  <div class="doc-panel" id="docPanel">
+    <h2>PH1 平台首页<br><span style="font-size:12px;font-weight:400;color:#94A3B8">原型设计规格说明</span></h2>
+
+    <div class="doc-section" id="docNav">
+      <h4><span class="doc-num">1</span>顶部导航栏</h4>
+      <p>固定吸顶，暗色半透明背景。左侧Logo+平台名称，中间6个主导航菜单，右侧登录/注册按钮。当前页「首页」高亮。</p>
+    </div>
+
+    <div class="doc-section" id="docBanner">
+      <h4><span class="doc-num">2</span>Banner品牌区</h4>
+      <p>深色渐变背景，展示平台名称、定位slogan、CTA操作按钮。支持三种用户状态：未登录/已登录未入驻/已入驻。</p>
+    </div>
+
+    <div class="doc-section" id="docMetrics">
+      <h4><span class="doc-num">3</span>核心指标区</h4>
+      <p>4组运营数据指标横向排列：入驻机构、数据空间、数据产品、合约履约。每60秒自动刷新，来源于管理端运营报表接口。</p>
+    </div>
+
+    <div class="doc-section" id="docSpaces">
+      <h4><span class="doc-num">4</span>热门数据空间</h4>
+      <p>4列等宽卡片网格，最多展示4个热门空间。每张卡片含名称、描述、成员数、产品数、行业标签。点击跳转至空间详情页。</p>
+    </div>
+
+    <div class="doc-section" id="docProducts">
+      <h4><span class="doc-num">5</span>热门数据产品</h4>
+      <p>4列等宽产品卡片，含名称、提供方、行业标签、描述、数据格式。提供「申请使用」快捷操作按钮，登录后可见。</p>
+    </div>
+
+    <div class="doc-section" id="docResources">
+      <h4><span class="doc-num">6</span>最新数据资源</h4>
+      <p>纵向列表展示前5条最新上架数据资源。每行含资源名称、提供方、行业分类、上架时间、数据格式。斑马线交替行底。</p>
+    </div>
+
+    <div class="doc-section" id="docEcosystem">
+      <h4><span class="doc-num">7</span>合作生态+资讯动态</h4>
+      <p>双栏布局。左栏2行×4列机构Logo网格，展示8家入驻机构。右栏5条资讯动态列表，含标题、分类标签、发布日期。</p>
+    </div>
+
+    <div class="doc-section" id="docFooter">
+      <h4><span class="doc-num">8</span>底部页脚</h4>
+      <p>深色背景，左侧Logo+名称，中间链接组（关于/协议/隐私/联系），底部版权声明+ICP备案号。</p>
+    </div>
+
+    <div class="doc-section" style="border-left: 3px solid var(--amber-accent); background: #FFFBEB;">
+      <h4 style="color: var(--amber-accent);">交互规则要点</h4>
+      <ul style="color: var(--slate-600);">
+        <li>导航栏固定吸顶，不随页面滚动</li>
+        <li>6个信息区背景交替（白/灰）</li>
+        <li>卡片hover轻微上浮+边框高亮</li>
+        <li>数据异步加载，先骨架屏后替换</li>
+        <li>空数据兜底"暂无数据"</li>
+        <li>「查看全部」统一右侧对齐</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===================== SVG Connection Lines ===================== -->
+  <svg class="svg-lines" id="svgLines"></svg>
+</div>
+
+<script>
+(function() {
+  function drawLines() {
+    const svg = document.getElementById('svgLines');
+    const mainContent = document.getElementById('mainContent');
+    const mainRect = mainContent.getBoundingClientRect();
+    const docPanel = document.getElementById('docPanel');
+    const docRect = docPanel.getBoundingClientRect();
+
+    if (window.innerWidth < 1280 || docRect.width < 100) {
+      svg.innerHTML = '';
+      return;
+    }
+
+    const map = [
+      { leftId: 'heroBanner', rightId: 'docBanner', num: 2 },
+      { leftId: 'metricsBar', rightId: 'docMetrics', num: 3 },
+      { leftId: 'spacesSection', rightId: 'docSpaces', num: 4 },
+      { leftId: 'productsSection', rightId: 'docProducts', num: 5 },
+      { leftId: 'resourcesSection', rightId: 'docResources', num: 6 },
+      { leftId: 'ecosystemCol', rightId: 'docEcosystem', num: 7 },
+    ];
+
+    let html = '';
+    map.forEach((item, idx) => {
+      const leftEl = document.getElementById(item.leftId);
+      const rightEl = document.getElementById(item.rightId);
+      if (!leftEl || !rightEl) return;
+      const lr = leftEl.getBoundingClientRect();
+      const rr = rightEl.getBoundingClientRect();
+
+      const x1 = lr.right;
+      const y1 = lr.top + lr.height / 2;
+      const x2 = rr.left;
+      const y2 = rr.top + rr.height / 2;
+      const cx1 = x1 + (x2 - x1) * 0.4;
+      const cx2 = x2 - (x2 - x1) * 0.3;
+
+      html += `<path id="line${item.num}" d="M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}"/>`;
+      html += `<circle id="dot${item.num}" cx="${x1}" cy="${y1}" r="4"/>`;
+      // Number label
+      html += `<text x="${x1 + (x2 - x1) * 0.15}" y="${y1 - 8}" fill="#D97706" font-size="12" font-weight="700">${item.num}</text>`;
+    });
+    svg.innerHTML = html;
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    drawLines();
+    setTimeout(drawLines, 500);
+  });
+  window.addEventListener('resize', drawLines);
+  document.getElementById('mainContent').addEventListener('scroll', drawLines);
+})();
+</script>
+</body>
+</html>

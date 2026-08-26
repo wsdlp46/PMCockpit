@@ -15,9 +15,7 @@
 
 ## 安装
 
-```bash
-cp -r project-intake ~/skills/
-```
+在 PMCockpit 仓库根目录执行 `bash .ai/install.sh`；具体工具适配见 `.ai/TOOL-MAPPING.md`。
 
 ## 许可
 
@@ -27,4 +25,4 @@ Apache 2.0
 
 微信公众号：青燃AI说
 
-> 本 Skill 内置于 [pm-assistant-lrw](https://github.com/wsdlp46/pm-assistant-lrw) Expert 中，配合 project-retrospective 形成知识库管理闭环。
+> 本 Skill 是 PMCockpit 的核心能力，配合 `project-retrospective-pm` 形成材料入库与经验沉淀闭环。

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>U1-首页 — 原型</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif}
+body{min-height:100vh;display:flex}
+.phone-wrap{position:relative;flex-shrink:0;width:400px;height:850px;margin:20px auto;background:#fff;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,.12);overflow:hidden;display:flex;flex-direction:column}
+.status-bar{height:28px;background:linear-gradient(135deg,#C53030,#E74C3C);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:11px;color:rgba(255,255,255,.85)}
+.nav-bar{height:44px;background:linear-gradient(135deg,#C53030,#E74C3C);display:flex;align-items:center;justify-content:center;padding:0 16px;position:relative}
+.nav-bar i{font-size:16px;position:absolute;left:16px;color:#fff;cursor:pointer;}
+.nav-title{font-size:17px;color:#fff;font-weight:500}
+.phone-body{flex:1;overflow-y:auto;position:relative}
+.phone-body::-webkit-scrollbar{display:none}
+
+/* 红色横幅 */
+.banner{position:relative;height:200px;background:linear-gradient(135deg,#B71C1C,#D32F2F,#E53935);overflow:hidden}
+.banner::after{content:"";position:absolute;bottom:-30px;left:-20%;right:-20%;height:80px;background:#fff;border-radius:50% 50% 0 0;z-index:2}
+.banner-title{position:absolute;left:20px;top:26px;z-index:5;font-size:22px;font-weight:500;color:#FFE066;text-shadow:0 2px 4px rgba(0,0,0,.15)}
+.banner-sub{position:absolute;left:20px;top:58px;z-index:5;font-size:13px;color:rgba(255,255,255,.7)}
+.banner-deco{position:absolute;right:10px;top:10px;z-index:3;width:120px;height:120px;opacity:.35}
+.banner-deco-2{position:absolute;right:60px;bottom:40px;z-index:3;width:80px;height:80px;opacity:.25}
+.ribbon{position:absolute;bottom:20px;right:0;z-index:2;width:160px;height:60px;opacity:.15}
+
+/* 白色内容区 */
+.content{padding:0 16px;padding-top:8px;background:#fff;position:relative;z-index:3}
+.section-title{font-size:16px;font-weight:500;color:#333;margin:14px 0 8px}
+
+/* 我的权益 - 浮动卡片（叠在Banner弧度上） */
+.my-card-float{padding:0 12px;position:relative;z-index:10;margin-top:-60px}
+.my-card{background:#fff;border-radius:12px;padding:16px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.my-card::before{content:"";position:absolute;right:-10px;top:-10px;width:60px;height:60px;background:radial-gradient(circle,rgba(197,48,48,.06),transparent 70%);border-radius:50%}
+.my-status{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.status-dot{width:8px;height:8px;background:#009965;border-radius:50%}
+.my-status .t{font-size:14px;color:#333;font-weight:500}
+.my-sub{font-size:12px;color:#606266;line-height:1.6}
+.my-validity{display:flex;align-items:center;gap:6px;margin:10px 0 14px}
+.my-validity span:first-child{font-size:11px;color:#909399}
+.my-validity span:nth-child(2){font-size:12px;color:#333;font-weight:500}
+.my-validity .vtag{font-size:11px;background:#E6F7EE;color:#009965;padding:2px 8px;border-radius:4px}
+.my-btn{width:100%;height:40px;background:linear-gradient(135deg,#C53030,#E74C3C);color:#fff;border:none;border-radius:20px;font-size:14px;font-weight:500;cursor:pointer;position:relative;z-index:2}
+.my-btn:active{opacity:.85}
+.my-btn-outline{width:100%;height:40px;background:#fff;color:#C53030;border:1.5px solid #C53030;border-radius:20px;font-size:14px;font-weight:500;cursor:pointer}
+.my-btn-outline:active{background:#FFF5F5}
+
+/* 无权益状态 */
+.my-card-empty{text-align:center;padding:20px 16px 16px}
+.my-card-empty .empty-icon{width:44px;height:44px;border-radius:50%;background:#F5F5F5;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:20px;color:#C0C4CC}
+.my-card-empty .empty-title{font-size:14px;color:#909399;margin-bottom:4px}
+.my-card-empty .empty-sub{font-size:12px;color:#C0C4CC;margin-bottom:14px}
+
+/* 状态切换开关 */
+.proto-toggle{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 12px;background:#FEF3C7;border-radius:8px;border:1px solid #FCD34D}
+.proto-toggle .toggle-label{font-size:12px;color:#92400E;font-weight:500}
+.toggle-switch{position:relative;width:44px;height:24px;background:#D1D5DB;border-radius:12px;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle-switch.active{background:#009965}
+.toggle-switch::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle-switch.active::after{transform:translateX(20px)}
+
+/* 个性推荐 - 双列卡片 */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.rec-card-left{grid-row:span 2;background:linear-gradient(180deg,#FDF2F2,#FFEBEE);border-radius:12px;padding:14px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;min-height:180px;cursor:pointer}
+.rec-card-left:active{opacity:.85}
+.rec-card-left .rec-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#C53030,#E74C3C);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;margin-bottom:8px}
+.rec-card-left .rec-title{font-size:15px;font-weight:500;color:#333}
+.rec-card-left .rec-addr{font-size:12px;color:#909399;margin-top:4px;line-height:1.4}
+.rec-card-left .rec-tag{display:inline-block;font-size:11px;background:rgba(197,48,48,.1);color:#C53030;padding:3px 8px;border-radius:10px;margin-top:8px}
+.rec-card-right{background:linear-gradient(180deg,#FDF2F2,#FFEBEE);border-radius:12px;padding:12px;position:relative;overflow:hidden;cursor:pointer;min-height:85px;display:flex;flex-direction:column;justify-content:space-between}
+.rec-card-right:active{opacity:.85}
+.rec-card-right .rec-title{font-size:14px;font-weight:500;color:#333}
+.rec-card-right .rec-addr{font-size:11px;color:#909399;margin-top:3px}
+.rec-card-right .rec-tag{font-size:10px;background:rgba(197,48,48,.1);color:#C53030;padding:2px 6px;border-radius:8px;display:inline-block;margin-top:4px}
+
+/* 快捷入口 */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.quick-card{background:linear-gradient(180deg,#FFF8F0,#FFF0E0);border-radius:12px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.quick-card:active{opacity:.85}
+.quick-icon{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#C53030,#E74C3C);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0}
+.quick-label{font-size:14px;color:#333;font-weight:500}
+
+/* 政策资讯 */
+.news-section{background:linear-gradient(180deg,#FDF2F2,#FFEBEE);border-radius:12px;padding:12px 14px}
+.news-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.news-header .nh{font-size:15px;font-weight:500;color:#333}
+.news-header .more{font-size:12px;color:#C53030}
+.news-item{padding:10px 0;border-bottom:1px solid rgba(197,48,48,.06);cursor:pointer}
+.news-item:last-child{border-bottom:none}
+.news-item:active{opacity:.7}
+.news-title{font-size:14px;color:#333;font-weight:500;margin-bottom:4px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.news-meta{font-size:11px;color:#909399}
+
+/* 吉祥物 */
+.mascot{position:absolute;right:6px;bottom:12px;width:48px;height:48px;z-index:10;opacity:.85}
+
+/* 右侧说明区 */
+.proto-panel{width:380px;padding:24px;background:#FFFBEB;border-left:4px solid #F59E0B;flex-shrink:0}
+.proto-panel h2{font-size:16px;color:#92400E;margin-bottom:16px}
+.note{font-size:13px;color:#78350F;margin-bottom:12px;line-height:1.7}
+.anno{font-size:12px;color:#B45309;background:#FEF3C7;padding:10px 12px;border-radius:8px;border-left:3px solid #F59E0B;margin-bottom:10px}
+.proto-ele{border:2px dashed #D97706;padding:4px 8px;border-radius:6px;font-size:12px;color:#92400E;margin-bottom:8px;background:#FFFBEB}
+</style>
+</head>
+<body>
+<div class="phone-wrap">
+  <div class="status-bar"><span>9:41</span><span><i class="fas fa-signal" style="margin-right:4px"></i><i class="fas fa-wifi" style="margin-right:4px"></i><i class="fas fa-battery-full"></i></span></div>
+  <div class="nav-bar">
+    <i class="fas fa-chevron-left" style="font-size:16px;cursor:pointer;" onclick="history.back()" title="返回"></i>
+    <div class="nav-title">优待对象优待</div>
+  </div>
+  <div class="phone-body">
+    <!-- 红色横幅 -->
+    <div class="banner">
+      <svg class="banner-deco" viewBox="0 0 100 100"><polygon points="50,5 20,98 95,35 5,35 80,98" fill="#FFE066"/></svg>
+      <svg class="banner-deco-2" viewBox="0 0 100 100"><polygon points="50,5 20,98 95,35 5,35 80,98" fill="#FFE066"/></svg>
+      <svg class="ribbon" viewBox="0 0 200 60">
+        <path d="M0,30 Q50,0 100,30 T200,30" stroke="rgba(255,200,100,.3)" stroke-width="3" fill="none"/>
+        <path d="M0,45 Q50,15 100,45 T200,45" stroke="rgba(255,200,100,.2)" stroke-width="2" fill="none"/>
+      </svg>
+      <div class="banner-title">优待对象优待服务</div>
+      <div class="banner-sub">军旗荣光&nbsp;&nbsp;尊享优待</div>
+    </div>
+    <!-- 我的权益浮动卡片（叠在Banner弧度上） -->
+    <div class="my-card-float">
+      <!-- 有权益状态 -->
+      <div class="my-card" id="card-has">
+        <div class="my-status"><div class="status-dot"></div><div class="t">已认证：优待对象</div></div>
+        <div class="my-sub">优待对象可享受餐饮优惠、休闲养生、健身锻炼等多个专属优待权益</div>
+        <button class="my-btn" data-nav-external="电子证照展码页" style="margin-top:10px;">出示身份码</button>
+      </div>
+      <!-- 无权益状态 -->
+      <div class="my-card my-card-empty" id="card-empty" style="display:none;">
+        <div class="empty-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="empty-title">暂未领取权益</div>
+        <div class="empty-sub">前往认证并领取专属优待权益</div>
+        <button class="my-btn-outline" data-nav-external="认证授权页">前往授权领取</button>
+      </div>
+    </div>
+    <!-- 白色内容区 -->
+    <div class="content">
+      <!-- 个性推荐 -->
+      <div class="section-title">附近权益场所</div>
+      <div class="card-grid">
+        <div class="rec-card-left" data-nav="U3-权益场所详情页.html">
+          <div>
+            <div class="rec-icon"><i class="fas fa-utensils"></i></div>
+            <div class="rec-title">湘聚阁餐厅</div>
+            <div class="rec-addr">芗城区南昌路88号</div>
+          </div>
+          <span class="rec-tag">0.8公里 · 3项权益</span>
+        </div>
+        <div class="rec-card-right" data-nav="U3-权益场所详情页.html">
+          <div class="rec-title">御足堂足浴</div>
+          <div class="rec-addr">芗城区延安北路128号</div>
+          <span class="rec-tag">1.5公里 · 2项</span>
+        </div>
+        <div class="rec-card-right" data-nav="U3-权益场所详情页.html">
+          <div class="rec-title">力美健身中心</div>
+          <div class="rec-addr">龙文区水仙大街66号</div>
+          <span class="rec-tag">2.3公里 · 2项</span>
+        </div>
+      </div>
+      <!-- 快捷入口 -->
+      <div class="section-title">快捷服务</div>
+      <div class="quick-grid">
+        <div class="quick-card" data-nav="U2-权益场所列表页.html">
+          <div class="quick-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="quick-label">权益场所</div>
+        </div>
+        <div class="quick-card" data-nav="U4-权益信息列表页.html">
+          <div class="quick-icon"><i class="fas fa-shield-alt"></i></div>
+          <div class="quick-label">权益信息</div>
+        </div>
+      </div>
+      <!-- 政策资讯 -->
+      <div class="section-title">政策资讯</div>
+      <div class="news-section" style="margin-bottom:20px;">
+        <div class="news-item" data-nav="U6-政策资讯详情页.html">
+          <div class="news-title">关于进一步完善优待对象优先优待服务的通知</div>
+          <div class="news-meta">2025-03-10</div>
+        </div>
+        <div class="news-item" data-nav="U6-政策资讯详情页.html">
+          <div class="news-title">关于进一步完善优待对象交通优待的通知</div>
+          <div class="news-meta">2025-02-28</div>
+        </div>
+        <div class="news-item" data-nav="U6-政策资讯详情页.html">
+          <div class="news-title">XX市新增优待对象餐饮休闲优待场所公告</div>
+          <div class="news-meta">2025-01-15</div>
+        </div>
+        <div class="news-item" data-nav="U6-政策资讯详情页.html">
+          <div class="news-title">优待对象优待证专属权益使用指南（2025版）</div>
+          <div class="news-meta">2024-12-20</div>
+        </div>
+      </div>
+    </div>
+    <!-- 吉祥物 -->
+    <svg class="mascot" viewBox="0 0 48 48"><defs><radialGradient id="mg" cx=".3" cy=".3"><stop offset="0%" stop-color="#60A5FA"/><stop offset="100%" stop-color="#3B82F6"/></radialGradient></defs><ellipse cx="24" cy="44" rx="14" ry="3" fill="rgba(0,0,0,.08)"/><path d="M14 38 Q10 28 14 18 Q18 8 24 8 Q30 8 34 18 Q38 28 34 38 Z" fill="url(#mg)"/><circle cx="19" cy="22" r="3" fill="#fff"/><circle cx="19" cy="22" r="1.5" fill="#1e3a5f"/><circle cx="29" cy="22" r="3" fill="#fff"/><circle cx="29" cy="22" r="1.5" fill="#1e3a5f"/><path d="M21 30 Q24 33 27 30" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M14 14 Q8 8 4 14" stroke="#60A5FA" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M34 14 Q40 8 44 14" stroke="#60A5FA" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M24 4 L24 1 M20 6 L17 3 M28 6 L31 3" stroke="#FBBF24" stroke-width="2" stroke-linecap="round"/></svg>
+  </div>
+</div>
+
+<!-- 导航 Toast -->
+<div class="nav-toast" id="navToast" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.5);color:#fff;padding:10px 16px;border-radius:8px;font-size:16px;z-index:9999;pointer-events:none;opacity:0;transition:opacity .3s;"></div>
+
+<!-- 右侧说明 -->
+<div class="proto-panel">
+  <h2>U1 — 首页</h2>
+  <div class="anno">页面包含5个区域：Banner横幅、我的权益浮动卡片、附近权益场所、快捷服务、政策资讯</div>
+  <div class="proto-toggle">
+    <span class="toggle-label">权益卡片状态：</span>
+    <div class="toggle-switch active" id="toggleCard" onclick="toggleCardState()"></div>
+    <span style="font-size:11px;color:#92400E;" id="toggleLabel">有权益</span>
+  </div>
+  <div class="proto-ele" id="e-my">我的权益卡片</div>
+  <div class="note">卡片浮动在Banner弧度上（白色背景+阴影）。有权益时展示认证状态、权益简述、"出示身份码"按钮；无权益时展示空状态提示，点击"前往授权领取"跳转认证授权页。右侧开关可切换两种状态。</div>
+  <div class="proto-ele" id="e-rec">附近权益场所</div>
+  <div class="note">根据用户定位推荐最近2-3个权益场所。左侧大卡片展示最近场所，右侧两个小卡片展示次近场所。点击任一场所跳转场所详情页。</div>
+  <div class="proto-ele" id="e-quick">快捷服务入口</div>
+  <div class="note">两个圆形图标快捷入口：权益场所（跳转场所列表页）和权益信息（跳转权益信息列表页）。</div>
+  <div class="proto-ele" id="e-news">政策资讯列表</div>
+  <div class="note">展示最近发布的优待对象优待相关政策资讯，默认4条，下滑可加载更多。点击资讯标题跳转资讯详情页。</div>
+</div>
+
+<script>
+function showNavToast(msg){const t=document.getElementById('navToast');t.textContent=msg;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',1200);}
+function toggleCardState(){
+  const tgl=document.getElementById('toggleCard');
+  const label=document.getElementById('toggleLabel');
+  const has=document.getElementById('card-has');
+  const empty=document.getElementById('card-empty');
+  tgl.classList.toggle('active');
+  if(tgl.classList.contains('active')){
+    label.textContent='有权益';
+    has.style.display='block';
+    empty.style.display='none';
+  }else{
+    label.textContent='无权益';
+    has.style.display='none';
+    empty.style.display='block';
+    empty.querySelector('.my-card-empty').style.display='block';
+  }
+}
+document.addEventListener('click',function(e){
+  const navEl=e.target.closest('[data-nav]');
+  if(navEl){showNavToast('页面跳转中...');setTimeout(()=>{window.location.href=navEl.dataset.nav;},300);return;}
+  const extEl=e.target.closest('[data-nav-external]');
+  if(extEl){showNavToast('跳转至'+extEl.dataset.navExternal);return;}
+});
+</script>
+</body>
+</html>
