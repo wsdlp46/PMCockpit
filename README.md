@@ -22,10 +22,10 @@ PMCockpit 的解法是 **把规范变成 AI 能读的 skills**：不写零散提
 - **结构化规则而非提示词**：设计规范、检查清单、模板都是独立文件，AI 执行 skill 时编程式引用，不是塞进一段超长 prompt。
 - **经验闭环**：复盘 → 项目总结 → 对外输出三级递进（`05经验总结/`），做完一个项目留下可复用的资产，而不只是一堆交付物。
 
-## Quick Start（3 步）
+## Quick Start（克隆后 3 步）
 
 ```bash
-# 1. 克隆框架
+# 1. 克隆公开发布版；仓库根目录就是完整工作区
 git clone https://github.com/wsdlp46/PMCockpit.git 我的工作区
 cd 我的工作区
 
@@ -42,7 +42,7 @@ bash .ai/install.sh
 #    建真实项目：说“新建项目”；已有项目再说“开始新版本”。
 ```
 
-`install.sh` 会自动检测 ZCode / Claude Code / WorkBuddy / Codex，把 8 个核心 Skill 软链到对应目录；仓库以后 `git pull` 更新，Skill 自动跟着更新。未识别到任何受支持工具时脚本会明确失败，而不会显示为安装成功。测试与 VitePress 都必须显式启用。
+`install.sh` 会自动检测 ZCode / Claude Code / WorkBuddy / Codex，把 8 个核心 Skill 软链到对应目录。测试与 VitePress 都必须显式启用。模板更新由维护者按发行规范同步；已有真实项目的工作区不建议直接覆盖更新。
 
 > 前置条件：已安装 ZCode、WorkBuddy、Claude Code 或 Codex 中的一种。各工具的 Skill 发现与显式调用方式不同，以 `.ai/TOOL-MAPPING.md` 为准；若未自动识别，直接告诉 AI 要使用的 Skill 名称即可。
 
@@ -58,10 +58,10 @@ bash .ai/install.sh
 
 ## 目录结构
 
-clone 后你得到一个完整的工作区骨架，直接在里面建项目：
+初始化后你得到一个完整的工作区骨架，直接在里面建项目：
 
 ```
-我的工作区/                      ← clone PMCockpit 得到
+我的工作区/                      ← 由 PMCockpit 初始化脚本创建
 ├── AGENTS.md                   ← 工作区级 AI 指令（写作纪律、硬约束）
 ├── .ai/
 │   ├── install.sh              ← 默认安装核心 Skills；可显式启用测试或文档站能力
@@ -79,7 +79,6 @@ clone 后你得到一个完整的工作区骨架，直接在里面建项目：
 ├── 05经验总结/                 ← 复盘 → 项目总结 → 经验输出 三级闭环
 ├── 06治理文档/                 ← 工作区自身的资产盘点与巡检报告
 ├── examples/                   ← 不含真实数据的十分钟演练项目
-├── 探索项目/                   ← 未立项的早期探索 / POC
 └── _附件/                      ← 二进制文件归档（图片、PDF、Excel）
 ```
 

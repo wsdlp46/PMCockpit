@@ -13,6 +13,7 @@ const contentRoots = [
   "04历史项目",
   "05经验总结",
   "06治理文档",
+  "examples",
   "探索项目",
 ];
 const skippedDirectories = new Set([
@@ -36,7 +37,7 @@ function walk(directory, files = []) {
 }
 
 const markdownFiles = contentRoots.flatMap((directory) => walk(path.join(root, directory)));
-for (const rootFile of ["00主页.md", "AGENTS.md"]) {
+for (const rootFile of ["README.md", "00主页.md", "AGENTS.md"]) {
   const absolutePath = path.join(root, rootFile);
   if (fs.existsSync(absolutePath)) markdownFiles.push(absolutePath);
 }

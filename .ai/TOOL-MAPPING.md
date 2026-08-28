@@ -54,8 +54,7 @@ bash .ai/install.sh --with-vitepress
 ## 安装方式
 
 ```bash
-git clone <仓库地址> <项目目录>
-cd <项目目录>
+# 当前目录已是由 PMCockpit 初始化的独立工作区
 bash .ai/install.sh
 # 仅当需要测试闭环时：
 bash .ai/install.sh --with-test
