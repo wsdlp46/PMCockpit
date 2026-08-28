@@ -22,14 +22,18 @@ PMCockpit 的解法是 **把规范变成 AI 能读的 skills**：不写零散提
 - **结构化规则而非提示词**：设计规范、检查清单、模板都是独立文件，AI 执行 skill 时编程式引用，不是塞进一段超长 prompt。
 - **经验闭环**：复盘 → 项目总结 → 对外输出三级递进（`05经验总结/`），做完一个项目留下可复用的资产，而不只是一堆交付物。
 
-## Quick Start（克隆后 3 步）
+## Quick Start（复制到独立工作区后 3 步）
 
 ```bash
-# 1. 克隆公开发布版；仓库根目录就是完整工作区
-git clone https://github.com/wsdlp46/PMCockpit.git 我的工作区
-cd 我的工作区
+# 1. 获取公开仓库
+git clone https://github.com/wsdlp46/PMCockpit.git
 
-# 2. 安装 8 个核心 Skill；仅 ZCode 额外链接方案设计 Agent
+# 2. 把仓库内容复制到独立工作区；不要直接在 PMCockpit 克隆目录中积累项目
+mkdir -p ../我的工作区
+rsync -a --exclude='.git' --exclude='.DS_Store' PMCockpit/ ../我的工作区/
+cd ../我的工作区
+
+# 3. 安装 8 个核心 Skill；仅 ZCode 额外链接方案设计 Agent
 bash .ai/install.sh
 
 # 需要测试规划、执行、报告或回归时，才执行：
@@ -43,6 +47,8 @@ bash .ai/install.sh
 ```
 
 `install.sh` 会自动检测 ZCode / Claude Code / WorkBuddy / Codex，把 8 个核心 Skill 软链到对应目录。测试与 VitePress 都必须显式启用。模板更新由维护者按发行规范同步；已有真实项目的工作区不建议直接覆盖更新。
+
+复制后，`AGENTS.md`、`.ai/`、通用规则和项目目录都位于独立工作区根目录，AI 工具才能按完整工作区规则工作。
 
 > 前置条件：已安装 ZCode、WorkBuddy、Claude Code 或 Codex 中的一种。各工具的 Skill 发现与显式调用方式不同，以 `.ai/TOOL-MAPPING.md` 为准；若未自动识别，直接告诉 AI 要使用的 Skill 名称即可。
 
